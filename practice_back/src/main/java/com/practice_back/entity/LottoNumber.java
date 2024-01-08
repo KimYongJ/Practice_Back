@@ -3,7 +3,6 @@ import com.practice_back.dto.LottoNumberDTO;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor // 모든 필드 값을 파라미터로 받는 생성자를 만들어줌
 @NoArgsConstructor // 파라미터가 없는 기본 생성자 생성
 @DynamicInsert // 쿼리실행시 값있는 컬럼만 포함해 insert(널 제외 동적insert)
-@EntityListeners(AuditingEntityListener.class)
+
 public class LottoNumber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

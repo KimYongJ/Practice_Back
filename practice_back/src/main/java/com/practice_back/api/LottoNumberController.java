@@ -15,7 +15,7 @@ public class LottoNumberController {
     @Autowired
     LottoNumberServiceImpl LnumServiceImpl;
     @GetMapping(value = "/get")
-    public LottoNumberDTO selectBoard() {
+    public LottoNumberDTO getNumber() {
         LottoNumberDTO result = LnumServiceImpl.getNumber();
         return result;
     }
