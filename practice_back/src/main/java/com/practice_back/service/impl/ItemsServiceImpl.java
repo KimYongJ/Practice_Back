@@ -22,15 +22,22 @@ public class ItemsServiceImpl implements ItemsService {
     @Autowired
     ItemsRepository itemsRepository;
 
+    // 각 카테고리별로 모든 품목을 조회하는 함수
     @Override
-    public ResponseEntity<?> getItemsByCatagory(String category)
+    public List<ItemsDTO> getItemsByCatagory(String category)
     {
         List<ItemsDTO> list = itemsRepository.findAllByCategory(category).stream().map(Items::toItemsDTO)
                 .collect(Collectors.toList());
 
-        return null;
+        return list;
     }
 
+    // 카테고리별, 아이템 가격으로 해당하는 품목을 조회해오는 함수
+    @Override
+    public List<ItemsDTO> getItemsByPrice(String category, Long  startprice, Long endprice){
+        List<ItemsDTO> list = itemsRepository.findAllByItemPrice(category, startprice, endprice).stream().map(Items::toItemsDTO)
+                .collect((Collectors.toList()));
 
-
+        return list;
+    }
 }

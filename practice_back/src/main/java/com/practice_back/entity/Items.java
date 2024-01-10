@@ -29,7 +29,7 @@ public class Items {
     private String itemTitle;               // 아이템 이름
 
     @Column(name = "item_price",nullable = false)
-    private int itemPrice;                  // 아이템 가격
+    private Long itemPrice;                  // 아이템 가격
 
     public static ItemsDTO toItemsDTO(Items items){
         return ItemsDTO.builder()

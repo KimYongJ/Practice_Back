@@ -4,10 +4,7 @@ import com.practice_back.service.impl.ItemsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/user/items")
@@ -17,15 +14,19 @@ public class ItemsController {
     ItemsServiceImpl itemsServiceImpl;
 
     /**
-     * 카테고리별 아이템 조회
+     * 카테고리별 금액에 따른 아이템 조회
      *
-     * @return ItemsDTO
+     * @return ResponseEntity<Object>
      */
     @GetMapping(value = "/{category}")
-    public ResponseEntity<?> getItemsByCatagory(@PathVariable(name = "category") String category)
+    public ResponseEntity<Object> getItemsUsePrice_0(@PathVariable("category") String category, @RequestParam Long startPrice, @RequestParam Long endPrice)
     {
-        return itemsServiceImpl.getItemsByCatagory(category);
+        return ResponseEntity.ok()
+                .header(null)
+                .body(itemsServiceImpl.getItemsByPrice( category, startPrice, endPrice ));
     }
+
+
 
 
 }
