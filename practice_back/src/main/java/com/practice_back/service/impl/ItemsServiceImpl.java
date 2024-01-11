@@ -22,13 +22,34 @@ public class ItemsServiceImpl implements ItemsService {
     @Autowired
     ItemsRepository itemsRepository;
 
+    // 모든 아이템 조회 함수
+    @Override
+    public List<ItemsDTO> getItems()
+    {
+        List<ItemsDTO> list = itemsRepository.findAll().stream().map(Items::toItemsDTO)
+                .collect(Collectors.toList());
+        return list;
+    }
+
+    // 아이템 PK값으로 조회하는 함수
+    public List<ItemsDTO> getItemsByItemId(Long itemId){
+        List<ItemsDTO> list = itemsRepository.findByItemId(itemId).stream().map(Items::toItemsDTO)
+                .collect(Collectors.toList());
+        return list;
+    }
+
+    // 아이템 이름으로 조회하는 함수
+    public List<ItemsDTO> getItemsByTitle(String itemTitle){
+        List<ItemsDTO> list = itemsRepository.findAllByItemTitleLike( "%" + itemTitle + "%").stream().map(Items::toItemsDTO)
+                .collect(Collectors.toList());
+        return list;
+    }
     // 각 카테고리별로 모든 품목을 조회하는 함수
     @Override
     public List<ItemsDTO> getItemsByCatagory(String category)
     {
         List<ItemsDTO> list = itemsRepository.findAllByCategory(category).stream().map(Items::toItemsDTO)
                 .collect(Collectors.toList());
-
         return list;
     }
 
@@ -37,7 +58,6 @@ public class ItemsServiceImpl implements ItemsService {
     public List<ItemsDTO> getItemsByPrice(String category, Long  startprice, Long endprice){
         List<ItemsDTO> list = itemsRepository.findAllByItemPrice(category, startprice, endprice).stream().map(Items::toItemsDTO)
                 .collect((Collectors.toList()));
-
         return list;
     }
 }
