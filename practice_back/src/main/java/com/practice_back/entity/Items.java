@@ -20,7 +20,7 @@ public class Items {
     private Long itemId;                    // 아이템의 고유 번호
 
     @Column(name = "category",nullable=false)
-    private String category;            // 아이템 카테고리( ex 0=국내차용품 ~ 6=DIY용품 )
+    private String category;            // 아이템 카테고리( ex 국내차용품 ~ DIY용품 )
 
     @Column(name = "img_url",nullable=false)
     private String imgUrl;                  // 이미지 주소

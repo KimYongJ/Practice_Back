@@ -39,7 +39,7 @@ public class ItemsServiceImpl implements ItemsService {
     }
 
     // 아이템 이름으로 조회하는 함수
-    public List<ItemsDTO> getItemsByTitle(String itemTitle){
+    public List<ItemsDTO> findAllByItemTitleLike(String itemTitle){
         List<ItemsDTO> list = itemsRepository.findAllByItemTitleLike( "%" + itemTitle + "%").stream().map(Items::toItemsDTO)
                 .collect(Collectors.toList());
         return list;
