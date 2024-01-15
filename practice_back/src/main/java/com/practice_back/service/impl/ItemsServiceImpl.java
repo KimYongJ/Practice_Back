@@ -1,16 +1,14 @@
 package com.practice_back.service.impl;
-
 import com.practice_back.dto.ItemsDTO;
 import com.practice_back.entity.Items;
 import com.practice_back.repository.ItemsRepository;
 import com.practice_back.service.ItemsService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,40 +22,26 @@ public class ItemsServiceImpl implements ItemsService {
 
     // 모든 아이템 조회 함수
     @Override
-    public List<ItemsDTO> getItems()
+    public Page<ItemsDTO> getItems(String category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable)
     {
-        List<ItemsDTO> list = itemsRepository.findAll().stream().map(Items::toItemsDTO)
-                .collect(Collectors.toList());
-        return list;
+        if (itemTitle != null) {
+            return itemsRepository.findByItemTitleContaining(itemTitle, pageable)
+                    .map(Items::toItemsDTO);
+        } else if (category != null && startPrice != null && endPrice != null) {
+            return itemsRepository.findByCategoryAndItemPriceRange(category, startPrice, endPrice, pageable)
+                    .map(Items::toItemsDTO);
+        }
+        // 기본적으로 모든 아이템을 반환하거나, 다른 기본 동작을 정의할 수 있음
+        return itemsRepository.findAll(pageable)
+                .map(Items::toItemsDTO);
     }
 
     // 아이템 PK값으로 조회하는 함수
+    @Override
     public List<ItemsDTO> getItemsByItemId(Long itemId){
         List<ItemsDTO> list = itemsRepository.findByItemId(itemId).stream().map(Items::toItemsDTO)
                 .collect(Collectors.toList());
         return list;
     }
 
-    // 아이템 이름으로 조회하는 함수
-    public List<ItemsDTO> findAllByItemTitleLike(String itemTitle){
-        List<ItemsDTO> list = itemsRepository.findAllByItemTitleLike( "%" + itemTitle + "%").stream().map(Items::toItemsDTO)
-                .collect(Collectors.toList());
-        return list;
-    }
-    // 각 카테고리별로 모든 품목을 조회하는 함수
-    @Override
-    public List<ItemsDTO> getItemsByCatagory(String category)
-    {
-        List<ItemsDTO> list = itemsRepository.findAllByCategory(category).stream().map(Items::toItemsDTO)
-                .collect(Collectors.toList());
-        return list;
-    }
-
-    // 카테고리별, 아이템 가격으로 해당하는 품목을 조회해오는 함수
-    @Override
-    public List<ItemsDTO> getItemsByPrice(String category, Long  startprice, Long endprice){
-        List<ItemsDTO> list = itemsRepository.findAllByItemPrice(category, startprice, endprice).stream().map(Items::toItemsDTO)
-                .collect((Collectors.toList()));
-        return list;
-    }
 }

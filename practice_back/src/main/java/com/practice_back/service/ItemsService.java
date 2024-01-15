@@ -1,5 +1,7 @@
 package com.practice_back.service;
 import com.practice_back.dto.ItemsDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -7,9 +9,6 @@ import java.util.List;
 
 public interface ItemsService {
 
-    public List<ItemsDTO> getItems();
-    public List<ItemsDTO> findAllByItemTitleLike(String category);
+    public Page<ItemsDTO> getItems(String category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable);
     public List<ItemsDTO> getItemsByItemId(Long itemId);
-    public List<ItemsDTO> getItemsByCatagory(String category);
-    public List<ItemsDTO> getItemsByPrice(String category, Long  startprice, Long endprice);
 }

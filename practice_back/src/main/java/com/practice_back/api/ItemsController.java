@@ -1,10 +1,17 @@
 package com.practice_back.api;
 
+import com.practice_back.dto.ItemsDTO;
 import com.practice_back.service.impl.ItemsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/user/items")
@@ -14,65 +21,51 @@ public class ItemsController {
     ItemsServiceImpl itemsServiceImpl;
 
     /**
-     * 모든 아이템을 조회합니다.
-     *
+     * 조건별 아이템을 조회합니다.
+     * @param itemTitle 품목명( 아이템 검색시 사용 )
+     * @param category 카테고리
+     * @param startPrice 카테고리 검색시 최소 가격
+     * @param endPrice 카테고리 검색시 최대 가격
+     * @param sortField 정렬하려는 필드( itemPrice )
+     * @param sortDir 정렬 방향을 의미 'asc' , 'desc'
+     * @param pageable 아이템 페이지 번호, 최대 표시할 아이템수 ex) ?page=0&size=5
      * @return 아이템 조회 결과를 담은 ResponseEntity
      */
     @GetMapping()
-    public ResponseEntity<Object> getItems()
+    public ResponseEntity<Object> getItems(
+            @RequestParam(required = false) String itemTitle,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Long startPrice,
+            @RequestParam(required = false) Long endPrice,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false) String sortDir,
+            Pageable pageable)
     {
-        // ResponseEntity를 사용하여 응답을 구성
-        return ResponseEntity.ok()
-                .header(null)
-                .body(itemsServiceImpl.getItems());
-    }
+        Pageable sortedPageable;
+        if (sortField != null && sortDir != null) {// 정렬 조건이 있는 경우
+            sortedPageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.fromString(sortDir), sortField));
+        } else {
+            // 정렬 조건이 없는 경우 기본 Pageable 사용
+            sortedPageable = pageable;
+        }
 
+        Page<ItemsDTO> items =  itemsServiceImpl.getItems(category, itemTitle, startPrice, endPrice, sortedPageable);
+        return ResponseEntity.ok(items);
+    }
     /**
-     * 아이템 이름을 LIKE 연산자를 사용하여 조회합니다.
+     * 아이템 고유 식별자(Item ID)를 사용하여 해당 아이템을 조회합니다.
      *
-     * @param itemTitle 조회할 아이템의 이름 또는 부분 이름
+     * @param item_id 조회할 아이템의 식별자
      * @return 아이템 조회 결과를 담은 ResponseEntity
      */
-    @GetMapping("/searchProduct")
-    public ResponseEntity<Object> getItemsByTitle(@RequestParam String itemTitle)
+    @GetMapping("/product_page")
+    public ResponseEntity<Object> productPage(@RequestParam Long item_id)
     {
-        // ResponseEntity를 사용하여 응답을 구성
-        return ResponseEntity.ok()
-                .header(null)
-                .body(itemsServiceImpl.findAllByItemTitleLike(itemTitle));
-    }
-
-
-    /**
-     * 아이템 식별자(Item ID)를 사용하여 해당 아이템을 조회합니다.
-     *
-     * @param itemId 조회할 아이템의 식별자
-     * @return 아이템 조회 결과를 담은 ResponseEntity
-     */
-    @GetMapping("/productPage")
-    public ResponseEntity<Object> productPage(@RequestParam Long itemId)
-    {
-        // ResponseEntity를 사용하여 응답을 구성
-        return ResponseEntity.ok()
-                .header(null)
-                .body(itemsServiceImpl.getItemsByItemId(itemId));
-    }
-
-    /**
-     * 카테고리별로 지정된 금액 범위에 속하는 아이템을 조회합니다.
-     *
-     * @param category   조회할 아이템의 카테고리
-     * @param startPrice 조회할 아이템의 최소 금액
-     * @param endPrice   조회할 아이템의 최대 금액
-     * @return 아이템 조회 결과를 담은 ResponseEntity
-     */
-    @GetMapping(value = "/category") // 다양한 카테고리에 대한 아이템 조회를 지원하기 위해 카테고리를 변수로 받습니다.
-    public ResponseEntity<Object> getItemsByPrice(@RequestParam String category, @RequestParam Long startPrice, @RequestParam Long endPrice)
-    {
-        // ResponseEntity를 사용하여 응답을 구성
-        return ResponseEntity.ok()
-                .header(null)
-                .body(itemsServiceImpl.getItemsByPrice( category, startPrice, endPrice ));
+        List<ItemsDTO> item = itemsServiceImpl.getItemsByItemId(item_id);
+        return ResponseEntity.ok(item);
     }
 
 }
