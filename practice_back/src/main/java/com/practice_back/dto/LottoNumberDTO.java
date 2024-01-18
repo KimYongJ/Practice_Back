@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-@Data
+@Data// Getter , Setter, toString, equals, hashCode 자동생성
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

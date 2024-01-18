@@ -19,9 +19,6 @@ public class Items {
     @Column(name = "item_id")
     private Long itemId;                    // 아이템의 고유 번호
 
-    @Column(name = "category",nullable=false)
-    private String category;            // 아이템 카테고리( ex 국내차용품 ~ DIY용품 )
-
     @Column(name = "img_url",nullable=false)
     private String imgUrl;                  // 이미지 주소
 
@@ -29,12 +26,16 @@ public class Items {
     private String itemTitle;               // 아이템 이름
 
     @Column(name = "item_price",nullable = false)
-    private Long itemPrice;                  // 아이템 가격
+    private Long itemPrice;                 // 아이템 가격
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;              // 아이템 카테고리( ex 국내차용품 ~ DIY용품 )
 
     public static ItemsDTO toItemsDTO(Items items){
         return ItemsDTO.builder()
                 .itemId(items.getItemId())
-                .category(items.getCategory())
+                .categoryDTO(Category.toCategoryDTO(items.getCategory()))
                 .imgUrl(items.getImgUrl())
                 .itemTitle(items.getItemTitle())
                 .itemPrice(items.getItemPrice())

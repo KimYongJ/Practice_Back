@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/user/number")
-@RequiredArgsConstructor
 public class LottoNumberController {
     @Autowired
     LottoNumberServiceImpl LnumServiceImpl;

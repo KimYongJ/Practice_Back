@@ -1,7 +1,7 @@
 package com.practice_back.response;
 import lombok.Data;
 
-@Data
+@Data // Getter , Setter, toString, equals, hashCode 자동생성
 public class Message {
 	
 	private com.practice_back.response.StatusEnum status;

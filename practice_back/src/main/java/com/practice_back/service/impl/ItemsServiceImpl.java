@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,17 +23,9 @@ public class ItemsServiceImpl implements ItemsService {
 
     // 모든 아이템 조회 함수
     @Override
-    public Page<ItemsDTO> getItems(String category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable)
+    public Page<ItemsDTO> getItems(Long itemId, List<Long> category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable)
     {
-        if (itemTitle != null) {
-            return itemsRepository.findByItemTitleContaining(itemTitle, pageable)
-                    .map(Items::toItemsDTO);
-        } else if (category != null && startPrice != null && endPrice != null) {
-            return itemsRepository.findByCategoryAndItemPriceRange(category, startPrice, endPrice, pageable)
-                    .map(Items::toItemsDTO);
-        }
-        // 기본적으로 모든 아이템을 반환하거나, 다른 기본 동작을 정의할 수 있음
-        return itemsRepository.findAll(pageable)
+        return itemsRepository.findItemsByDynamicCondition(itemId, category, itemTitle, startPrice, endPrice, pageable)
                 .map(Items::toItemsDTO);
     }
 
