@@ -21,7 +21,7 @@ public class LottoNumberController {
      *
      * @return 조회된 로또 번호를 담은 ResponseEntity
      */
-    @GetMapping(value = "/get")
+    @GetMapping()
     public ResponseEntity<Object> getNumber() {
         return ResponseEntity.ok()
                 .header(null)

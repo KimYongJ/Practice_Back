@@ -13,8 +13,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Transactional
 public class LottoNumberServiceImpl implements LottoNumberService {
-    @Autowired
-    LottoNumberRepository LnumRepo;
+
+    private final LottoNumberRepository LnumRepo;
     @Override
     public LottoNumberDTO getNumber(){
         int[] arr = randomArray();

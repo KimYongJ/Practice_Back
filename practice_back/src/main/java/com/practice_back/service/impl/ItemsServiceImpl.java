@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class ItemsServiceImpl implements ItemsService {
 
-    @Autowired
-    ItemsRepository itemsRepository;
+
+    private final ItemsRepository itemsRepository;
 
     // 모든 아이템 조회 함수
     @Override

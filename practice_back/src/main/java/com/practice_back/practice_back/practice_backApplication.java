@@ -13,7 +13,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 @EntityScan(basePackages = { "com.practice_back.entity" })
 @EnableJpaRepositories(basePackages = { "com.practice_back.repository" })
-@ComponentScan(basePackages = { "com.practice_back.api", "com.practice_back.service" })
+@ComponentScan(basePackages = { "com.practice_back.api", "com.practice_back.service", "com.practice_back.config","com.practice_back.jwt" })
 @EnableJpaAuditing
 public class practice_backApplication {
 

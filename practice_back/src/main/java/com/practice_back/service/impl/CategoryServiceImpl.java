@@ -17,8 +17,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     public List<CategoryDTO> getCategories()
     {
         return categoryRepository.findAll()
