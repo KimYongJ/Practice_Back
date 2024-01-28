@@ -1,16 +1,26 @@
 package com.practice_back.config;
+import com.practice_back.handler.AuthenticationEntryPointHandler;
+import com.practice_back.handler.CustomAccessDeniedHandler;
+import com.practice_back.handler.CustomLogoutHandler;
 import com.practice_back.jwt.AccessTokenFilter;
+import com.practice_back.jwt.CustomLoginFilter;
 import com.practice_back.jwt.TokenProvider;
+import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 /*
  * [ 스프링 시큐리티 흐름 ]
@@ -20,6 +30,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 1-1. AuthenticationManager 데이터 전달 코드 예시 : Authentication authentication = authenticationManager.authenticate(      new UsernamePasswordAuthenticationToken(empId, password)  );
  *                                               : Authentication authentication = authenticationManagerBuilder.getObject().authenticate( new UsernamePasswordAuthenticationToken(empId, password)  );
  * 2. 인증 및 권한 부여 : 요청에 대해 인증(Authentication) 및 권한 부여(Authorization) 절차를 진행. 이 과정에서 사용자 신원 확인과 해당 요청에 대한 접근 권한 검증
+ * 2-1. 로그인시 흐름 : 로그인 성공시 Authentication객체가 SecurityContextHolder에 저장되고 사용자의 요청이 들어올 때마다 filterChain내에서 설정된 규칙에따라 SecurityContextHolder의 Authentication
+객체를 조회해 사용자의 권한을 확인한다.
  * 3. SecurityFilterChain 은 여러 보안 필터들을 순차적으로 적용하는 체인으로 필터 순서와 종류를 조정할 수 있다.
  * */
 
@@ -44,9 +56,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * */
 @EnableWebSecurity
 public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
-
+    private final CustomLogoutHandler customLogoutHandler;
     private final TokenProvider tokenProvider;
-
     /*
      * [ configure 함수 설명 ]
      * - 해당 함수는  HTTP 요청에 대한 보안 요구 사항(인증 방식, 접근 권한, CSRF 보호 등)을 사용자가 원하는 대로 설정하고 특정 필터를 보안 필터 체인에 추가하는 역할을 한다.
@@ -59,7 +70,22 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
      *    http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
      * }
      */
-
+    /*
+    * 특정 경로에 대해 필터를 작동하지 않게 하기 위한 설정예시
+    * */
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer(){
+//        return web -> {web.ignoring().antMatchers("/api/auth/login"); };
+//    }
+    /*
+     * [ authenticationManager ]
+     * - AuthenticationManager는 스프링 시큐리티에서 자동으로 Bean으로 등록되지 않기 때문에 직접 주입할 수 없다. 직접 생성해줘야함.
+     * */
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
 
     /*
@@ -100,31 +126,37 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
      * */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpsecurity) throws Exception { // 이 메소드는 스프링 시큐리트의 핵심 구성 요소 중 하나이다. 이 메소드는 스프링 부트의 자동 구성과정 중 스프링 시큐리티에 의해 호출됨
-        httpsecurity
+        AuthenticationManager authManager = authenticationManager(httpsecurity.getSharedObject(AuthenticationConfiguration.class));
+        CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider);
+        customLoginFilter.setAuthenticationManager(authManager);
+
+        return httpsecurity
                 .authorizeRequests()
-                .antMatchers("/api/user/**").permitAll()
-//                .antMatchers("/api/user/category").permitAll()
-//                .antMatchers("/api/user/items/**").permitAll()
-//                .antMatchers("/api/user/number").permitAll()
-                // "/api/user/**" 경로는 "ADMIN", "USER", "MANAGER" 역할을 가진 사용자만 접근 가능 //hasAnyRole, hasRole은 ROLE_ 접두사를 붙임
+                .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup").permitAll()
+//                .antMatchers("/api/user/items/**").hasRole("ADMIN")
+                //hasAnyRole, hasRole은 ROLE_ 접두사를 붙임
                 //  .antMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "MANAGER")
-                //  .antMatchers("/api/admin/**").hasRole("ADMIN")
+                //.antMatchers("/api/user/cart/**").authenticated()  // 로그인한 사용자만 접근 가능
                 // 그 외 모든 요청은 인증이 필요함
                 .anyRequest().authenticated()
                 .and()
-                .csrf().disable() // CSRF 보호를 비활성화
-                // REST API를 통해 세션 없이 토큰을 주고받으며 데이터를 주고받기 때문에 세션설정은 STATELESS로 설정.
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .logout() // 스프링 시큐리티는 /logout 경로로 오는 post요청에 대해 .logout()을 실행한다.
+                    .logoutUrl("/api/auth/logout") // 커스텀 로그아웃 URL 설정
+                    .addLogoutHandler(customLogoutHandler)
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)) // 이것을 적어주어야 customLogoutHandler가 작동한다.
+                    .and()
+                .addFilterBefore(new AccessTokenFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class) // 엑세스 토큰 검증 필터 추가
+                .addFilterBefore(customLoginFilter, UsernamePasswordAuthenticationFilter.class) // 로그인 필터
+                .exceptionHandling()
+                .authenticationEntryPoint(new AuthenticationEntryPointHandler()) // 인증되지 않은 사용자가 보호된 리소스에 접근하려고 할 때 호출(사용자가 로그인하지 않았거나, 인증 토큰이 없는 경우)
+                .accessDeniedHandler(new CustomAccessDeniedHandler()) // 인증은 되었으나 접근 권한이 없는 리소스에 접근하려 할 때 호출됨.
                 .and()
-                .exceptionHandling();
-                 //이후 예외를 핸들링하는 것은 예시
-                 // .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                 // .accessDeniedHandler(jwtAccessDeniedHandler);
-
-        // JWT 필터 추가
-        AccessTokenFilter accesstokenfilter = new AccessTokenFilter(tokenProvider);
-        httpsecurity.addFilterBefore(accesstokenfilter, UsernamePasswordAuthenticationFilter.class);
-
-        return httpsecurity.build();
+                .cors() // 스프링 시큐리티 사용시 스프링MVC와는 별도의 컴포넌트이기 때문에 각각 cors설정을 해줘야 한다.
+                .and()
+                .csrf().disable() // CSRF 보호를 비활성화
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)// REST API를 통해 세션 없이 토큰을 주고받으며 데이터를 주고받기 때문에 세션설정은 STATELESS로 설정.
+                .and()
+                .build();
     }
 }

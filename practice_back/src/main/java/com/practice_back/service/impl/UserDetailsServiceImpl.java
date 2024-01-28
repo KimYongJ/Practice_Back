@@ -55,7 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 - 스프링 시큐리티에서 hasRole과 hasAuthority는 약간 다르게 동작합니다. hasRole 메소드는 역할 이름 앞에 자동으로 "ROLE_" 접두사를 추가합니다. 예를 들어, hasRole("ADMIN")은 실제로 "ROLE_ADMIN"을 확인합니다. 반면, hasAuthority는 전달된 문자열을 그대로 사용합니다.
     * */
     private UserDetails createUserDetails(Member member) {
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority());
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().name());
         return new User(
                 String.valueOf(member.getEmail()),
                 member.getPassword(),

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor // 클래스 내에 final 키워드가 붙거나 @NonNull 어노테이션이 붙은 필드들을 인자로 하는 생성자를 자동으로 생성
 @RequestMapping(value = "/api/user/number")
 public class LottoNumberController {
-    @Autowired
-    LottoNumberServiceImpl LnumServiceImpl;
+    private final LottoNumberServiceImpl LnumServiceImpl;
 
     /**
      * 로또 번호를 조회하는 엔드포인트입니다.
@@ -24,7 +24,6 @@ public class LottoNumberController {
     @GetMapping()
     public ResponseEntity<Object> getNumber() {
         return ResponseEntity.ok()
-                .header(null)
                 .body(LnumServiceImpl.getNumber());
     }
 

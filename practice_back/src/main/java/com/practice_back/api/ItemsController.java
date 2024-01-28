@@ -2,7 +2,7 @@ package com.practice_back.api;
 
 import com.practice_back.dto.ItemsDTO;
 import com.practice_back.response.Message;
-import com.practice_back.response.StatusEnum;
+import com.practice_back.response.ErrorType;
 import com.practice_back.service.impl.ItemsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +16,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor // 클래스 내에 final 키워드가 붙거나 @NonNull 어노테이션이 붙은 필드들을 인자로 하는 생성자를 자동으로 생성
 @RequestMapping(value = "/api/user/items")
 public class ItemsController {
-    @Autowired
-    ItemsServiceImpl itemsServiceImpl;
+    private final ItemsServiceImpl itemsServiceImpl;
 
     /**
-     * 조건별 아이템을 조회합니다.
+     * 조건별 아이템을 조회
      * @param itemId 아이템 고유번호(하나의 상품 조회시 사용)
      * @param itemTitle 품목명( 아이템 검색시 사용 )
      * @param category 카테고리
@@ -50,28 +49,24 @@ public class ItemsController {
             Pageable pageable)
     {
         Pageable sortedPageable;
-        if (sortField != null && sortDir != null) {// 정렬 조건이 있는 경우
+        if (sortField != null && sortDir != null)// 정렬 조건이 있는 경우
+        {
             sortedPageable = PageRequest.of(
                     pageable.getPageNumber(),
                     pageable.getPageSize(),
                     Sort.by(Sort.Direction.fromString(sortDir), sortField));
-        } else {
-            // 정렬 조건이 없는 경우 기본 Pageable 사용
-            sortedPageable = pageable;
+        } else
+        {
+
+            sortedPageable = pageable;// 정렬 조건이 없는 경우 기본 Pageable 사용
         }
 
         Page<ItemsDTO> items =  itemsServiceImpl.getItems(itemId, category, itemTitle, startPrice, endPrice, sortedPageable);
-        Message message = new Message();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-        message.setMessage("조회 성공");
-        message.setStatus(StatusEnum.OK);
-        message.setData(items);
-        return new ResponseEntity<>(message, headers, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .body(new Message(ErrorType.OK, "조회 성공", items));
     }
     /**
-     * 아이템 고유 식별자(Item ID)를 사용하여 해당 아이템을 조회합니다.
+     * 아이템 고유 식별자(Item ID)를 사용하여 해당 아이템을 조회
      *
      * @param item_id 조회할 아이템의 식별자
      * @return 아이템 조회 결과를 담은 ResponseEntity

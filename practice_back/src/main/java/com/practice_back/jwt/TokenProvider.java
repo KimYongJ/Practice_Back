@@ -1,9 +1,14 @@
 package com.practice_back.jwt;
 
+import com.practice_back.response.ErrorType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.aop.ThrowsAdvice;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.CookieGenerator;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,6 +29,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
+
+import static com.practice_back.handler.HandlerFunc.handlerException;
 
 
 @Component
@@ -36,7 +44,7 @@ public class TokenProvider {
     @Value("${token.bearerType}")
     private String BEARER_TYPE; // Bearer는 OAuth 2.0  표준에서 정의된 인증 스키마이다.
     @Value("${token.accessTokenExpireTime}")
-    private long ACCESS_TOKEN_EXPIRE_TIME;
+    private Integer ACCESS_TOKEN_EXPIRE_TIME;
 
     /*
     * Key 객체는 JWT 토큰 생성에 사용되며 Key객체를 사용함으로 JWT가 변조되지 않았고, 해당 서버에서만 생성되었음을 보증한다.
@@ -50,6 +58,7 @@ public class TokenProvider {
         *  - 주어진 key값을 BASE64로 디코딩하여 바이트 배열로 변환한다.
         * */
         byte[] keyBytes = Decoders.BASE64.decode(key);
+
         /*
         *  [ Keys.hmacShaKeyFor(keyBytes) ]
         *  - 주어진 바이트배열(keyBytes)을 사용해 HMAC(Hash-based Message Authentication Code) SHA(보안 해시 알고리즘) 키를 생성하는 것
@@ -74,33 +83,41 @@ public class TokenProvider {
                 .compact();// 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
     }
 
+    // 토큰을 쿠키에 저장할 수 있도록 응답에 쿠키 저장
+    public void saveCookie(HttpServletResponse response , String cookieName, String token){
+        ResponseCookie cookie =ResponseCookie.from(cookieName, token)
+                .domain("localhost")
+                .sameSite("Lax") // Lax, None, Strict
+       //         .secure(true)//메서드를 호출하여 쿠키가 HTTPS를 통해서만 전송되도록 함. 개발환경에서는 비활성화, 비활성화 하면서 httpOnly가 true이면 sameSite는 None으로할 수 없다.
+                .httpOnly(true)// JavaScript가 쿠키에 접근하지 못하도록 설정,XSS 공격으로부터 쿠키를 보호
+                .path("/")
+                .maxAge(ACCESS_TOKEN_EXPIRE_TIME/1000)// 쿠키의 유효 시간 설정
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
 
     // JWT 토큰을 검증하기 위한 함수
     public boolean validateToken(HttpServletResponse response, String token) throws Exception {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 서명입니다.");//400에러
         } catch (ExpiredJwtException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰이 만료되었습니다. 로그인 페이지로 이동하세요.");//401에러
-        } catch (UnsupportedJwtException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");//400에러
-        } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "JWT 토큰이 잘못되었습니다.");//400에러
+            handlerException(response, ErrorType.EXPIRED_TOKEN);
+        } catch (Exception e) {
+            handlerException(response, ErrorType.BAD_REQUEST);
         }
+
         return false;
     }
 
 
     // Jwt 토큰에서 인증 정보 조회, SecurityContextHolder에 저장하기 전 데이터를 가공하는 것
-    public Authentication getAuthentication(HttpServletResponse response, String accessToken) throws IOException {
+    public Authentication getAuthentication(HttpServletRequest request, String accessToken) {
 
         Claims claims = parseClaims(accessToken);// JWT 토큰에서 클레임(claims) 추출
 
         if (claims.get(AUTHORITIES_KEY) == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "권한 정보가 없는 토큰입니다.");//400에러
-            return null;
+            return null; // 권한이 없을 때 null 반환
         }
 
         // 권한 정보를 기반으로 GrantedAuthority 객체 리스트 생성
@@ -135,21 +152,29 @@ public class TokenProvider {
 
     // 사용자의 요청에서 토큰을 꺼내오는 함수
     public String getAccessToken(HttpServletRequest request){
-        String authorization = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
         String token = null;
-        if (authorization != null &&  authorization.startsWith("Bearer ")) {
-            token =  authorization.substring(7);
+        if(cookies != null){
+            for(Cookie cookie : cookies){
+                if("accessToken".equals(cookie.getName())){
+                    token = cookie.getValue();
+                }
+            }
         }
         return token;
     }
     // 쿠키 리셋
-    public void cookieReset(HttpServletResponse response)
+    public void cookieReset(HttpServletResponse response, String tokenName)
     {
-        CookieGenerator cg = new CookieGenerator();
-        cg.setCookieName("accessToken"); // 쿠키 이름 셋팅
-        cg.setCookieMaxAge(0); // 쿠키 최대수명을 0초로 하여 쿠키를 강제로 만료시킴
-        cg.addCookie(response, "1"); // 응답(response)에 쿠키를 추가하는 코드, "1"쿠키 벨류로 만료될 것이라 임의 값 삽입
-        contextReset();
+        ResponseCookie cookie =ResponseCookie.from(tokenName, "1")
+                .domain("localhost")
+                .sameSite("Lax") // Lax, None, Strict
+                //         .secure(true)//메서드를 호출하여 쿠키가 HTTPS를 통해서만 전송되도록 함. 개발환경에서는 비활성화, 비활성화 하면서 httpOnly가 true이면 sameSite는 None으로할 수 없다.
+                .httpOnly(true)// JavaScript가 쿠키에 접근하지 못하도록 설정,XSS 공격으로부터 쿠키를 보호
+                .path("/")
+                .maxAge(0)// 쿠키의 유효 시간 설정
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     // 요청한 사용자의 정보를 꺼내오는 함수

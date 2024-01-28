@@ -15,4 +15,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     *  - Optional 사용시 특정 동작을 수행하는 함수를 전용으로 제공한다( ifPresent(), orElse(), orElseThrow() 등 . )
     * */
     Optional<Member> findByEmail(String email); // 이메일을 기준으로 Member 조회
+    boolean existsByEmail(String email);
+    Member save(Member member);
 }
