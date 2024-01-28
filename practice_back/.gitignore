@@ -9,7 +9,9 @@ build/
 **/application.properties
 */application.properties
 /application.properties
-
+src/main/resources/application.yml
+application.yml
+aws.yml
 
 ### STS ###
 .apt_generated
