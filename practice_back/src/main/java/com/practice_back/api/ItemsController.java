@@ -61,9 +61,7 @@ public class ItemsController {
             sortedPageable = pageable;// 정렬 조건이 없는 경우 기본 Pageable 사용
         }
 
-        Page<ItemsDTO> items =  itemsServiceImpl.getItems(itemId, category, itemTitle, startPrice, endPrice, sortedPageable);
-        return ResponseEntity.ok()
-                .body(new Message(ErrorType.OK, "조회 성공", items));
+        return itemsServiceImpl.getItems(itemId, category, itemTitle, startPrice, endPrice, sortedPageable);
     }
     /**
      * 아이템 고유 식별자(Item ID)를 사용하여 해당 아이템을 조회
@@ -74,8 +72,7 @@ public class ItemsController {
     @GetMapping("/{item_id}")
     public ResponseEntity<Object> productPage(@PathVariable Long item_id)
     {
-        List<ItemsDTO> item = itemsServiceImpl.getItemsByItemId(item_id);
-        return ResponseEntity.ok(item);
+        return itemsServiceImpl.getItemsByItemId(item_id);
     }
 
 }

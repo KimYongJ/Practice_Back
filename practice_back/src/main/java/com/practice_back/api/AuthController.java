@@ -20,7 +20,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Map;
 
-@RestController
+@RestController // @Controller와 @ResponseBody 어노테이션의 기능 결합
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController
@@ -32,15 +32,7 @@ public class AuthController
     * @return 회원가입 결과를 담은 ResponseEntity
     * */
     @PostMapping("/signup")
-    public ResponseEntity<Object> signup(@Valid @RequestBody MemberDTO memberDTO, Errors errors, HttpServletResponse response){
-        if(errors.hasErrors())
-        {
-            /* 유효성 통과 못한 필드와 메시지를 핸들링 */
-            Map<String, String> validatorResult = authServiceImpl.validateHandling(errors);
-            return ResponseEntity
-                    .badRequest()
-                    .body(new Message(ErrorType.BAD_REQUEST, "유효성 검증 실패", validatorResult));
-        }
+    public ResponseEntity<Object> signup(@Valid @RequestBody MemberDTO memberDTO, HttpServletResponse response){
 
         if(authServiceImpl.existsByEmail(memberDTO.getEmail()))
         {

@@ -1,18 +1,16 @@
 package com.practice_back.dto;
 
 import com.practice_back.entity.Authority;
+import com.practice_back.entity.Cart;
 import com.practice_back.entity.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Data
+@Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,11 +26,14 @@ public class MemberDTO {
 
     private Authority authority;
 
-    public static Member toMemberEntity(MemberDTO memberDto){
+    private Cart cart;
+
+    public static Member toEntity(MemberDTO memberDto){
         return Member.builder()
                 .email(memberDto.email)
                 .password(memberDto.password)
                 .authority(memberDto.authority)
+                .cart(memberDto.getCart())
                 .build();
     }
 
@@ -41,6 +42,7 @@ public class MemberDTO {
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .authority(authority)
+                .cart(new Cart())
                 .build();
     }
 }

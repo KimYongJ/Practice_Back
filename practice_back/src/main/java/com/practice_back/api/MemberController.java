@@ -1,16 +1,24 @@
 package com.practice_back.api;
 
+import com.practice_back.response.ErrorType;
+import com.practice_back.response.Message;
+import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController // @Controller와 @ResponseBody 어노테이션의 기능 결합
 @RequestMapping("/api/user/member")
 @RequiredArgsConstructor
 public class MemberController {
 
+    private final MemberServiceImpl memberServiceImpl;
 
-  //  @GetMapping()
-  //  public
+    @DeleteMapping()
+    public ResponseEntity<Object> deleteUser(){
+        return memberServiceImpl.deleteByEmail();
+    }
 }

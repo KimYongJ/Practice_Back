@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public interface AuthService {
-    public Map<String, String> validateHandling(Errors errors);
     public MemberDTO signup(MemberDTO memberDTO,  HttpServletResponse response);
     public boolean existsByEmail(String email);
 }

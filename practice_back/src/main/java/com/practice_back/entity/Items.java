@@ -28,14 +28,14 @@ public class Items {
     @Column(name = "item_price",nullable = false)
     private Long itemPrice;                 // 아이템 가격
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;              // 아이템 카테고리( ex 국내차용품 ~ DIY용품 )
 
-    public static ItemsDTO toItemsDTO(Items items){
+    public static ItemsDTO toDTO(Items items){
         return ItemsDTO.builder()
                 .itemId(items.getItemId())
-                .categoryDTO(Category.toCategoryDTO(items.getCategory()))
+                .categoryDTO(Category.toDTO(items.getCategory()))
                 .imgUrl(items.getImgUrl())
                 .itemTitle(items.getItemTitle())
                 .itemPrice(items.getItemPrice())

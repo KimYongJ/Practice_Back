@@ -36,6 +36,6 @@ public interface ItemsRepository extends JpaRepository<Items, Long>  {
                                             Pageable pageable);
 
 
-    public List<Items> findByItemId(Long itemId);
+    public Items findByItemId(Long itemId);
 
 }

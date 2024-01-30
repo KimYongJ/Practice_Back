@@ -133,10 +133,11 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
         return httpsecurity
                 .authorizeRequests()
                 .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup").permitAll()
+                .antMatchers("/api/user/cart").permitAll()
+           //     .antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
 //                .antMatchers("/api/user/items/**").hasRole("ADMIN")
                 //hasAnyRole, hasRole은 ROLE_ 접두사를 붙임
                 //  .antMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "MANAGER")
-                //.antMatchers("/api/user/cart/**").authenticated()  // 로그인한 사용자만 접근 가능
                 // 그 외 모든 요청은 인증이 필요함
                 .anyRequest().authenticated()
                 .and()
