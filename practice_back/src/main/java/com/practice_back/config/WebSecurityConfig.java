@@ -5,6 +5,7 @@ import com.practice_back.handler.CustomLogoutHandler;
 import com.practice_back.jwt.AccessTokenFilter;
 import com.practice_back.jwt.CustomLoginFilter;
 import com.practice_back.jwt.TokenProvider;
+import com.practice_back.repository.CartRepository;
 import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -58,6 +59,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
     private final CustomLogoutHandler customLogoutHandler;
     private final TokenProvider tokenProvider;
+    private final CartRepository cartRepository;
     /*
      * [ configure 함수 설명 ]
      * - 해당 함수는  HTTP 요청에 대한 보안 요구 사항(인증 방식, 접근 권한, CSRF 보호 등)을 사용자가 원하는 대로 설정하고 특정 필터를 보안 필터 체인에 추가하는 역할을 한다.
@@ -127,16 +129,15 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpsecurity) throws Exception { // 이 메소드는 스프링 시큐리트의 핵심 구성 요소 중 하나이다. 이 메소드는 스프링 부트의 자동 구성과정 중 스프링 시큐리티에 의해 호출됨
         AuthenticationManager authManager = authenticationManager(httpsecurity.getSharedObject(AuthenticationConfiguration.class));
-        CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider);
+        CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider, cartRepository);
         customLoginFilter.setAuthenticationManager(authManager);
 
         return httpsecurity
                 .authorizeRequests()
                 .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup").permitAll()
-                .antMatchers("/api/user/cart").permitAll()
            //     .antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
 //                .antMatchers("/api/user/items/**").hasRole("ADMIN")
-                //hasAnyRole, hasRole은 ROLE_ 접두사를 붙임
+                //hasAnyRole, hasRole은 ROLE_ 시큐리티가 자동으로 접두사를 붙임
                 //  .antMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "MANAGER")
                 // 그 외 모든 요청은 인증이 필요함
                 .anyRequest().authenticated()

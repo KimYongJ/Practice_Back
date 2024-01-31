@@ -1,6 +1,7 @@
 package com.practice_back.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice_back.repository.CartRepository;
 import com.practice_back.response.ErrorType;
 import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,10 +27,12 @@ import static com.practice_back.handler.HandlerFunc.handlerException;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider tokenProvider;
+    private final CartRepository cartRepository;
     @Setter
     AuthenticationManager authenticationManager;
-    public CustomLoginFilter(TokenProvider tokenProvider){
+    public CustomLoginFilter(TokenProvider tokenProvider, CartRepository cartRepository){
         this.tokenProvider = tokenProvider;
+        this.cartRepository = cartRepository;
         super.setFilterProcessesUrl("/api/auth/login"); // 로그인시 전달될 커스텀 api를 정의 한다.
     }
 
@@ -75,9 +78,13 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        String accessToken = tokenProvider.ceateAccessToken(principal.getUsername(), authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+
+        String email = principal.getUsername();
+
+        String accessToken = tokenProvider.ceateAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         tokenProvider.saveCookie(response,"accessToken",accessToken); // 응답에 토큰을 저장한다.
-        handlerException(response, ErrorType.LOGIN_SUCCESS);
+        long cntCartItems = cartRepository.countItemsByMemberEmail(email);
+        handlerException(response, ErrorType.LOGIN_SUCCESS, cntCartItems);
     }
     /*
     * 로그인 실패시 호출되는 함수

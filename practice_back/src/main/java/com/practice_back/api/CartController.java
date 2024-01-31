@@ -23,6 +23,8 @@ public class CartController {
         return cartServiceImpl.getCartByEmail();
     }
 
+    @GetMapping("/countitems")
+    public ResponseEntity<Object> countCartItems(){return cartServiceImpl.countCartItems();}
     @PostMapping()
     public ResponseEntity<Object> insertCartItem(@Valid @RequestBody CartRequestDTO cartRequestDTO) {// @RequestBody 어노테이션은 요청 본문의 데이터를 자바 객체로 자동 변환해줌
         return cartServiceImpl.insertCartItem(cartRequestDTO.getQuantity(), cartRequestDTO.getItemId());

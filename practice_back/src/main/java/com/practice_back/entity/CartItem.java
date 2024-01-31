@@ -30,9 +30,13 @@ public class CartItem {
 
     private int quantity;                   // 상품 수량
 
+    private long totalPrice;                // 상품 수량에 따른 총금액
+
     public static CartItemDTO toDTO(CartItem cartItem){
         return CartItemDTO.builder()
                 .id(cartItem.getId())
+                .quantity(cartItem.getQuantity())
+                .totalPrice(cartItem.getTotalPrice())
                 .cartId(cartItem.getCart() != null ? cartItem.getCart().getId() : null)
                 .itemsDTO(Items.toDTO(cartItem.getItems()))
                 .build();

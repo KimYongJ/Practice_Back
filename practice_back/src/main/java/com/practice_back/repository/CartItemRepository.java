@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface CartItemRepository  extends JpaRepository<CartItem, Long> {
     boolean existsByCartIdAndItemsItemId(Long cartId, Long ItemId);
     @Modifying // UPDATE, DELETE, INSERT와 같은 변경 쿼리에 사용되는 어노테이션
-    @Query("UPDATE CartItem ci SET ci.quantity = :quantity WHERE ci.cart.id = :cartId AND ci.items.itemId = :itemId")
-    int updateQuantityByCartIdAndItemId(@Param("quantity") int quantity, @Param("cartId") Long cartId, @Param("itemId") Long itemId);
+    @Query("UPDATE CartItem ci SET ci.totalPrice = :totalPrice , ci.quantity = :quantity WHERE ci.cart.id = :cartId AND ci.items.itemId = :itemId")
+    int updateTotalPriceQuantityByCartIdAndItemId(@Param("totalPrice") long totalPrice, @Param("quantity") int quantity, @Param("cartId") Long cartId, @Param("itemId") Long itemId);
 }
