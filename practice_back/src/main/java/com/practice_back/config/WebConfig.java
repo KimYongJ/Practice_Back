@@ -14,6 +14,13 @@ import java.util.List;
 
 
 // 배포환경에서 CORS 설정을 위한 클래스
+
+/*
+ * [ @Configuration 설명 ]
+ * - 해당 어노테이션을 사용하면 클래스가 스프링의 설정 정보를 포함하고있음을 나타낸다.(스프링 컨테이너에 의해 빈 설정을 위한 것으로 간주됨)
+ * - 해당 어노테이션을 쓴 클래스는 자동으로 빈으로 등록됨.(@Component 어노테이션 사용 불필요)
+ * - 이 클래스 안에 정의된 함수 중 @Bean 어노테이션이 붙은 메소드들로 부터 반환되는 객체들은 스프링 빈으로 등록된다. ( 함수 반환 객체가 빈으로 등록됨에 유의 )
+ * */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 

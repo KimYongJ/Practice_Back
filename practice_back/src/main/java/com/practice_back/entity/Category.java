@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Builder                                    // 빌더
 @AllArgsConstructor                         // 모든 필드 값을 파라미터로 받는 생성자를 만들어줌
 @NoArgsConstructor                          // 파라미터가 없는 기본 생성자 생성
-public class Category {
+public class Category extends BaseAudit{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")

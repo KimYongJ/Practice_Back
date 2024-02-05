@@ -14,7 +14,6 @@ import java.util.TimeZone;
 @EntityScan(basePackages = { "com.practice_back.entity" })
 @EnableJpaRepositories(basePackages = { "com.practice_back.repository" })
 @ComponentScan(basePackages = { "com.practice_back.api", "com.practice_back.service", "com.practice_back.config","com.practice_back.jwt","com.practice_back.handler" })
-@EnableJpaAuditing
 public class practice_backApplication {
 
 	public static void main(String[] args) {
