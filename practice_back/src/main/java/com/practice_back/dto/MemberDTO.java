@@ -30,9 +30,9 @@ public class MemberDTO {
 
     public static Member toEntity(MemberDTO memberDto){
         return Member.builder()
-                .email(memberDto.email)
-                .password(memberDto.password)
-                .authority(memberDto.authority)
+                .email(memberDto.getEmail())
+                .password(memberDto.getPassword())
+                .authority(memberDto.getAuthority())
                 .cart(memberDto.getCart())
                 .build();
     }

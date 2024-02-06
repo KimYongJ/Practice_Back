@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -38,6 +40,11 @@ public class Member extends BaseAudit{
     @JsonIgnoreProperties("member") // Cart 엔티티 내의 member 필드를 직렬화에서 제외(순환 참조 방지로 Member엔티티가 Cart를 불러올 때 Cart안에 Member엔티티는 불러오지 않음.)
     private Cart cart;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("member")
+    private List<DeliveryAddress> deliveryAddresses;
+
+
     /*
     * [@Enumerated]
     * - JPA사용시 엔티티의 필드가 열거 타입임을 지정할 때 사용함, 해당 어노테이션 사용시 지정된 열거형의 이름을 데이터베이스에 문자열로 저장할 수 있다.
@@ -51,9 +58,9 @@ public class Member extends BaseAudit{
 
     public static MemberDTO toDTO(Member member){
         return MemberDTO.builder()
-                .email(member.email)
-                .password(member.password)
-                .authority(member.authority)
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .authority(member.getAuthority())
                 .build();
     }
     public MemberDTO of(Member member){

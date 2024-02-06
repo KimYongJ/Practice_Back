@@ -21,6 +21,11 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryServiceImpl categoryServiceImpl;
+    /*
+     * 모든 카테고리 받아오기
+     *
+     * @return ResponseEntity<Object>
+     * */
     @GetMapping()
     public ResponseEntity<Object> getAllCategory()
     {

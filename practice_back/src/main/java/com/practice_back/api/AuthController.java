@@ -26,7 +26,7 @@ import java.util.Map;
 public class AuthController
 {
     private final AuthServiceImpl authServiceImpl;
-    /*
+    /**
     * 회원가입
     *
     * @return 회원가입 결과를 담은 ResponseEntity
@@ -45,7 +45,7 @@ public class AuthController
         memberDTO.setAuthority(Authority.ROLE_USER);
         MemberDTO resultDTO = authServiceImpl.signup(memberDTO, response);
 
-        /*
+        /**
         * 생성된 사용자에 대한 URI를 생성함. 보통의 관행을 따라함. 이 URI는 생성된 사용자의 고유 리소스를 가리킴
         * 여기서는 사용자의 이메일을 path 변수로 사용하여 URI를 구성, 프론트에서 생성된 경로로 리다이렉트 할 수 있음 ex)window.location.href = response.headers.location;
         * */

@@ -17,6 +17,11 @@ public class MemberController {
 
     private final MemberServiceImpl memberServiceImpl;
 
+    /**
+     * 회원 탈퇴
+     *
+     * @return ResponseEntity<Object>
+     * */
     @DeleteMapping()
     public ResponseEntity<Object> deleteUser(){
         return memberServiceImpl.deleteByEmail();
