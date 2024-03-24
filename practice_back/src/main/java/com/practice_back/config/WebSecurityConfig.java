@@ -10,6 +10,7 @@ import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -75,10 +76,10 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
     /*
     * 특정 경로에 대해 필터를 작동하지 않게 하기 위한 설정예시
     * */
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer(){
-//        return web -> {web.ignoring().antMatchers("/api/auth/login"); };
-//    }
+    //    @Bean
+    //    public WebSecurityCustomizer webSecurityCustomizer(){
+    //        return web -> {web.ignoring().antMatchers("/api/auth/login"); };
+    //    }
     /*
      * [ authenticationManager ]
      * - AuthenticationManager는 스프링 시큐리티에서 자동으로 Bean으로 등록되지 않기 때문에 직접 주입할 수 없다. 직접 생성해줘야함.
@@ -134,11 +135,12 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
 
         return httpsecurity
                 .authorizeRequests()
+                // 세부 권한 설정 후 permitAll로 해야 한다.시큐리티 적용 순서.
+                .antMatchers(HttpMethod.POST, "/api/user/items/**").hasRole("ADMIN") // hasAnyRole, hasRole 함수는 시큐리티가 자동으로 ROLE_ 접두사를 붙임
+                .antMatchers(HttpMethod.PUT, "/api/user/items/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PATCH, "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup").permitAll()
-           //     .antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
-//                .antMatchers("/api/user/items/**").hasRole("ADMIN")
-                //hasAnyRole, hasRole은 ROLE_ 시큐리티가 자동으로 접두사를 붙임
-                //  .antMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "MANAGER")
+                //.antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
                 // 그 외 모든 요청은 인증이 필요함
                 .anyRequest().authenticated()
                 .and()

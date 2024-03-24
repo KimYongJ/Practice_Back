@@ -3,6 +3,7 @@ package com.practice_back.api;
 import com.practice_back.dto.ItemsDTO;
 import com.practice_back.response.Message;
 import com.practice_back.response.ErrorType;
+import com.practice_back.service.ItemsService;
 import com.practice_back.service.impl.ItemsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor // 클래스 내에 final 키워드가 붙거나 @NonNull 어노테이션이 붙은 필드들을 인자로 하는 생성자를 자동으로 생성
 @RequestMapping(value = "/api/user/items")
 public class ItemsController {
-    private final ItemsServiceImpl itemsServiceImpl;
+    private final ItemsService itemsService;
 
     /**
      * 조건별 아이템을 조회
@@ -57,12 +58,12 @@ public class ItemsController {
                     Sort.by(Sort.Direction.fromString(sortDir), sortField));
         } else
         {
-
             sortedPageable = pageable;// 정렬 조건이 없는 경우 기본 Pageable 사용
         }
 
-        return itemsServiceImpl.getItems(itemId, category, itemTitle, startPrice, endPrice, sortedPageable);
+        return itemsService.getItems(itemId, category, itemTitle, startPrice, endPrice, sortedPageable);
     }
+
     /**
      * 아이템 고유 식별자(Item ID)를 사용하여 해당 아이템을 조회
      *
@@ -72,7 +73,11 @@ public class ItemsController {
     @GetMapping("/{item_id}")
     public ResponseEntity<Object> productPage(@PathVariable Long item_id)
     {
-        return itemsServiceImpl.getItemsByItemId(item_id);
+        return itemsService.getItemsByItemId(item_id);
     }
 
+    @PostMapping
+    public ResponseEntity<Object> insertItem(@RequestBody ItemsDTO itemsDTO){
+        return itemsService.insertItem(itemsDTO);
+    }
 }
