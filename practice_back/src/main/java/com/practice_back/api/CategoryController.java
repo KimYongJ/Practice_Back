@@ -3,6 +3,7 @@ package com.practice_back.api;
 import com.practice_back.dto.CategoryDTO;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
+import com.practice_back.service.CategoryService;
 import com.practice_back.service.impl.CategoryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import java.util.List;
 @RequestMapping(value = "/api/user/category")
 public class CategoryController {
 
-    private final CategoryServiceImpl categoryServiceImpl;
+    private final CategoryService categoryService;
     /*
      * 모든 카테고리 받아오기
      *
@@ -29,7 +30,7 @@ public class CategoryController {
     @GetMapping()
     public ResponseEntity<Object> getAllCategory()
     {
-        List<CategoryDTO> categories = categoryServiceImpl.getCategories();
+        List<CategoryDTO> categories = categoryService.getCategories();
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK, "성공",categories));
     }

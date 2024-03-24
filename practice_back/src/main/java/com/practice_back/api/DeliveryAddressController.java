@@ -1,6 +1,7 @@
 package com.practice_back.api;
 
 import com.practice_back.dto.DeliveryAddressDTO;
+import com.practice_back.service.DeliveryAddressService;
 import com.practice_back.service.impl.DeliveryAddressServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class DeliveryAddressController {
 
-    private final DeliveryAddressServiceImpl deliveryAddressServiceImpl;
+    private final DeliveryAddressService deliveryAddressService;
 
     /**
     * 모든 배송 정보 받아오기
@@ -22,7 +23,7 @@ public class DeliveryAddressController {
     * */
     @GetMapping
     public ResponseEntity<Object> getAllDeliveryInfo(){
-        return deliveryAddressServiceImpl.getAllDeliveryInfo();
+        return deliveryAddressService.getAllDeliveryInfo();
     }
 
     /**
@@ -32,7 +33,7 @@ public class DeliveryAddressController {
     * */
     @PostMapping
     public ResponseEntity<Object> insertDeliveryInfo(@Valid @RequestBody DeliveryAddressDTO deliveryAddressDTO){// @RequestBody 어노테이션은 요청 본문의 데이터를 자바 객체로 자동 변환함
-        return deliveryAddressServiceImpl.insertDeliveryInfo(deliveryAddressDTO);
+        return deliveryAddressService.insertDeliveryInfo(deliveryAddressDTO);
     }
 
     /**
@@ -42,7 +43,7 @@ public class DeliveryAddressController {
     * */
     @PatchMapping
     public ResponseEntity<Object> patchDeliveryInfo(@Valid @RequestBody DeliveryAddressDTO deliveryAddressDTO){
-        return deliveryAddressServiceImpl.patchDeliveryInfo(deliveryAddressDTO);
+        return deliveryAddressService.patchDeliveryInfo(deliveryAddressDTO);
     }
 
 
@@ -53,7 +54,7 @@ public class DeliveryAddressController {
     **/
     @PatchMapping("/updateprimary")
     public ResponseEntity<Object> patchDeliveryPrimary(@RequestBody DeliveryAddressDTO deliveryAddressDTO){
-        return deliveryAddressServiceImpl.patchDeliveryPrimary(deliveryAddressDTO);
+        return deliveryAddressService.patchDeliveryPrimary(deliveryAddressDTO);
     }
 
     /**
@@ -63,7 +64,7 @@ public class DeliveryAddressController {
     * */
     @DeleteMapping("/{deliveryAddressId}")
     public ResponseEntity<Object> deleteDeliveryInfo(@PathVariable Long deliveryAddressId){
-        return deliveryAddressServiceImpl.deleteDeliveryInfo(deliveryAddressId);
+        return deliveryAddressService.deleteDeliveryInfo(deliveryAddressId);
     }
 
 

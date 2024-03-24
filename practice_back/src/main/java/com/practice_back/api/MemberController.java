@@ -2,6 +2,7 @@ package com.practice_back.api;
 
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
+import com.practice_back.service.MemberService;
 import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberServiceImpl memberServiceImpl;
+    private final MemberService memberService;
 
     /**
      * 회원 탈퇴
@@ -24,6 +25,6 @@ public class MemberController {
      * */
     @DeleteMapping()
     public ResponseEntity<Object> deleteUser(){
-        return memberServiceImpl.deleteByEmail();
+        return memberService.deleteByEmail();
     }
 }

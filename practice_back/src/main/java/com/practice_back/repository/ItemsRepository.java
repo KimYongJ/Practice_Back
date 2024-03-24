@@ -38,4 +38,6 @@ public interface ItemsRepository extends JpaRepository<Items, Long>  {
 
     public Items findByItemId(Long itemId);
 
+
+
 }

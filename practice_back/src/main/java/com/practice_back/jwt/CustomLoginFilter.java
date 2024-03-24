@@ -1,6 +1,7 @@
 package com.practice_back.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice_back.dto.LoginDTO;
 import com.practice_back.repository.CartRepository;
 import com.practice_back.response.ErrorType;
 import lombok.Setter;
@@ -84,7 +85,12 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = tokenProvider.ceateAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         tokenProvider.saveCookie(response,"accessToken",accessToken); // 응답에 토큰을 저장한다.
         long cntCartItems = cartRepository.countItemsByMemberEmail(email);
-        handlerException(response, ErrorType.LOGIN_SUCCESS, cntCartItems);
+        boolean master = authorities.contains("ROLE_ADMIN");
+        LoginDTO loginDTO = LoginDTO.builder()
+                .cntCartItems(cntCartItems)
+                .master(master)
+                .build();
+        handlerException(response, ErrorType.LOGIN_SUCCESS, loginDTO);
     }
     /*
     * 로그인 실패시 호출되는 함수

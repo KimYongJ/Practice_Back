@@ -12,4 +12,5 @@ public interface ItemsService {
 
     public ResponseEntity<Object> getItems(Long itemId, List<Long> category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable);
     public ResponseEntity<Object> getItemsByItemId(Long itemId);
+    public ResponseEntity<Object> insertItem(ItemsDTO itemsDTO);
 }

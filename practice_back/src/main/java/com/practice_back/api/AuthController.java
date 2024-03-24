@@ -4,6 +4,7 @@ import com.practice_back.dto.MemberDTO;
 import com.practice_back.entity.Authority;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
+import com.practice_back.service.AuthService;
 import com.practice_back.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController
 {
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authService;
     /**
     * 회원가입
     *
@@ -34,7 +35,7 @@ public class AuthController
     @PostMapping("/signup")
     public ResponseEntity<Object> signup(@Valid @RequestBody MemberDTO memberDTO, HttpServletResponse response){
 
-        if(authServiceImpl.existsByEmail(memberDTO.getEmail()))
+        if(authService.existsByEmail(memberDTO.getEmail()))
         {
             /*이메일이 이미 있는 경우*/
             return ResponseEntity
@@ -43,7 +44,7 @@ public class AuthController
         }
         /* 사용자 데이터 저장 */
         memberDTO.setAuthority(Authority.ROLE_USER);
-        MemberDTO resultDTO = authServiceImpl.signup(memberDTO, response);
+        MemberDTO resultDTO = authService.signup(memberDTO, response);
 
         /**
         * 생성된 사용자에 대한 URI를 생성함. 보통의 관행을 따라함. 이 URI는 생성된 사용자의 고유 리소스를 가리킴
