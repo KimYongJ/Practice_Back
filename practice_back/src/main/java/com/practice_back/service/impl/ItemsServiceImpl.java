@@ -1,10 +1,8 @@
 package com.practice_back.service.impl;
 
 import com.practice_back.dto.CategoryDTO;
-import com.practice_back.dto.DeliveryAddressDTO;
 import com.practice_back.dto.ItemsDTO;
 import com.practice_back.entity.Category;
-import com.practice_back.entity.DeliveryAddress;
 import com.practice_back.entity.Items;
 import com.practice_back.repository.ItemsRepository;
 import com.practice_back.response.ErrorType;
@@ -57,5 +55,24 @@ public class ItemsServiceImpl implements ItemsService {
         itemsDTO = Items.toDTO(itemsRepository.save(items));
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"저장했습니다.", itemsDTO ));
+    }
+
+    @Override
+    public ResponseEntity<Object> updateItem(ItemsDTO dto){
+        ItemsDTO itemsDTO = Items.toDTO(itemsRepository.getById(dto.getItemId()));
+        itemsDTO.setItemTitle(dto.getItemTitle());
+        itemsDTO.setItemPrice(dto.getItemPrice());
+        itemsDTO.setImgUrl(dto.getImgUrl());
+        itemsDTO = Items.toDTO(itemsRepository.save(ItemsDTO.toEntity(itemsDTO)));
+
+        return ResponseEntity.ok()
+                .body(new Message(ErrorType.OK,"저장했습니다.", itemsDTO ));
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteItem(Long itemId){
+        itemsRepository.deleteById(itemId);
+        return ResponseEntity.ok()
+                .body(new Message(ErrorType.OK, "삭제했습니다.", 1));
     }
 }

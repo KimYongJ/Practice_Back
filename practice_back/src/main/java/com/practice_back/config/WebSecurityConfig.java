@@ -135,10 +135,11 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
 
         return httpsecurity
                 .authorizeRequests()
-                // 세부 권한 설정 후 permitAll로 해야 한다.시큐리티 적용 순서.
+                // 시큐리티 적용 순서 : 세부 권한 설정 후 permitAll등 더 넓은 권한 설정해야함
                 .antMatchers(HttpMethod.POST, "/api/user/items/**").hasRole("ADMIN") // hasAnyRole, hasRole 함수는 시큐리티가 자동으로 ROLE_ 접두사를 붙임
                 .antMatchers(HttpMethod.PUT, "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PATCH, "/api/user/items/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup").permitAll()
                 //.antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
                 // 그 외 모든 요청은 인증이 필요함

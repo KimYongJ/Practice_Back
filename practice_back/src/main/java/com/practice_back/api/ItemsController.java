@@ -1,23 +1,14 @@
 package com.practice_back.api;
 
 import com.practice_back.dto.ItemsDTO;
-import com.practice_back.response.Message;
-import com.practice_back.response.ErrorType;
 import com.practice_back.service.ItemsService;
-import com.practice_back.service.impl.ItemsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -76,8 +67,36 @@ public class ItemsController {
         return itemsService.getItemsByItemId(item_id);
     }
 
+    /**
+     * 관리자 권한으로 Item 정보 Insert
+     *
+     * @RequestBody ItemsDTO 저장할 아이템의 상세 정보들
+     * @return 저장한 아이템 결과를 담은 ResponseEntity
+     */
     @PostMapping
     public ResponseEntity<Object> insertItem(@RequestBody ItemsDTO itemsDTO){
         return itemsService.insertItem(itemsDTO);
     }
+
+    /**
+     * 관리자 권한으로 Item 정보 Update
+     *
+     * @RequestBody ItemsDTO 변경할 아이템의 상세 정보들
+     * @return 변경한 아이템 결과를 담은 ResponseEntity
+     */
+    @PatchMapping
+    public ResponseEntity<Object> updateItem(@RequestBody ItemsDTO itemsDTO){
+        return itemsService.updateItem(itemsDTO);
+    }
+    /**
+     * 관리자 권한으로 Item 정보 삭제
+     *
+     * @RequestBody ItemsDTO 삭제할 아이템정보
+     * @return 삭제한 아이템 결과를 담은 ResponseEntity
+     */
+    @DeleteMapping("/{item_id}")
+    public ResponseEntity<Object> deleteItem(@PathVariable Long item_id){
+        return itemsService.deleteItem(item_id);
+    }
+
 }
