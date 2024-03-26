@@ -1,10 +1,12 @@
 package com.practice_back.api;
 
+import com.practice_back.dto.EmailDTO;
 import com.practice_back.dto.MemberDTO;
 import com.practice_back.entity.Authority;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.AuthService;
+import com.practice_back.service.EmailAuthService;
 import com.practice_back.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class AuthController
 {
     private final AuthService authService;
+    private final EmailAuthService emailAuthService;
     /**
     * 회원가입
     *
@@ -43,7 +46,6 @@ public class AuthController
                     .body(new Message(ErrorType.DUPLICATE_EMAIL, "이미 가입된 이메일입니다.", null));
         }
         /* 사용자 데이터 저장 */
-        memberDTO.setAuthority(Authority.ROLE_USER);
         MemberDTO resultDTO = authService.signup(memberDTO, response);
 
         /**
@@ -60,4 +62,14 @@ public class AuthController
                 .body(new Message(ErrorType.SIGNUP_SUCCESS, "회원가입 성공",resultDTO));
 
     }
+    /*
+    * 비밀번호 찾기
+    *
+    * @return 성공 유무를 담은 ResponseEntity
+    * */
+    @PostMapping("/newpassword")
+    public ResponseEntity<Object> sendNewPassword(@RequestBody EmailDTO emailDto) {
+        return emailAuthService.sendNewPassword(emailDto.getEmail());
+    }
+
 }

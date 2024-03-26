@@ -30,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public MemberDTO signup(MemberDTO memberDTO,  HttpServletResponse response)
     {
+        memberDTO.setAuthority(Authority.ROLE_USER);    // 가입한 사용자의 권한을 기본 user로 저장
         Member member = memberDTO.toMemberSignUp(passwordEncoder);
         member.getCart().setMember(member);
         memberService.save( member );
