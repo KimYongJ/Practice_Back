@@ -73,4 +73,7 @@ public class Member extends BaseAudit{
                 .authority(member.getAuthority())
                 .build();
     }
+    public void changePassword(String newPassword){
+        this.password = newPassword;
+    }
 }
