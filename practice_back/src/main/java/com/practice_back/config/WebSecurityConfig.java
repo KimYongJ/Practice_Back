@@ -141,7 +141,7 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
                 .antMatchers(HttpMethod.PATCH, "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup","/api/auth/newpassword").permitAll()
-                //.antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
+                .antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
                 // 그 외 모든 요청은 인증이 필요함
                 .anyRequest().authenticated()
                 .and()

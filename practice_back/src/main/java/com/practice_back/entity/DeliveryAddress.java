@@ -51,12 +51,12 @@ public class DeliveryAddress extends BaseAudit{
     }
     // 엔티티 업데이트를 위한 메소드
     public void update(DeliveryAddressDTO dto) {
-        if (dto.getRecipient() != null)         this.recipient      = dto.getRecipient();
-        if (dto.getContactNumber() != null)     this.contactNumber  = dto.getContactNumber();
-        if (dto.getPostalCode() != null)        this.postalCode     = dto.getPostalCode();
-        if (dto.getAddress() != null)           this.address        = dto.getAddress();
-        if (dto.getAddressDetail() != null)     this.addressDetail  = dto.getAddressDetail();
-        if (dto.getIsPrimary() != null)         this.isPrimary      = dto.getIsPrimary();
+        if (dto.getRecipient()  != null)         this.recipient      = dto.getRecipient();
+        if (dto.getContactNumber()  != null)     this.contactNumber  = dto.getContactNumber();
+        if (dto.getPostalCode()     != null)     this.postalCode     = dto.getPostalCode();
+        if (dto.getAddress()        != null)     this.address        = dto.getAddress();
+        if (dto.getAddressDetail()  != null)     this.addressDetail  = dto.getAddressDetail();
+        if (dto.getIsPrimary()      != null)     this.isPrimary      = dto.getIsPrimary();
     }
     public static DeliveryAddressDTO toDTO(DeliveryAddress deliveryAddress){
         return DeliveryAddressDTO.builder()
