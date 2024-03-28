@@ -2,6 +2,7 @@ package com.practice_back.dto;
 
 import com.practice_back.entity.Authority;
 import com.practice_back.entity.Cart;
+import com.practice_back.entity.DeliveryAddress;
 import com.practice_back.entity.Member;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;

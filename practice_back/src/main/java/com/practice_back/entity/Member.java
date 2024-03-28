@@ -2,7 +2,9 @@ package com.practice_back.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.practice_back.dto.DeliveryAddressDTO;
 import com.practice_back.dto.MemberDTO;
+import com.practice_back.dto.UserProfileDTO;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 @Getter
 @Setter
@@ -60,11 +63,16 @@ public class Member extends BaseAudit{
     @Column(name = "authority")
     private Authority authority;
 
-    public static MemberDTO toDTO(Member member){
-        return MemberDTO.builder()
+    public static UserProfileDTO toDTO(Member member){
+        DeliveryAddressDTO delAddDTO = member.getDeliveryAddresses()
+                                        .stream().filter(DeliveryAddress::getIsPrimary)
+                                        .findFirst()
+                                        .map(DeliveryAddress::toDTO)
+                                        .orElse(new DeliveryAddressDTO());
+        return UserProfileDTO.builder()
                 .email(member.getEmail())
-                .password(member.getPassword())
-                .authority(member.getAuthority())
+                .phoneNumber(member.getPhoneNumber())
+                .deliveryAddressDTO(delAddDTO)
                 .build();
     }
     public MemberDTO of(Member member){
@@ -76,4 +84,5 @@ public class Member extends BaseAudit{
     public void changePassword(String newPassword){
         this.password = newPassword;
     }
+    public void changePhoneNumber(String phoneNumber){ this.phoneNumber = phoneNumber;}
 }

@@ -62,7 +62,7 @@ public class AuthController
                 .body(new Message(ErrorType.SIGNUP_SUCCESS, "회원가입 성공",resultDTO));
 
     }
-    /*
+    /**
     * 비밀번호 찾기
     *
     * @return 성공 유무를 담은 ResponseEntity
