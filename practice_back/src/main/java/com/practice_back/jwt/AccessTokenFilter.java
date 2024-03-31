@@ -40,7 +40,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = tokenProvider.getAccessToken(request);                                 // 사용자 요청으로부터 엑세스 토큰을 가져온다.
+        String accessToken = tokenProvider.getToken(request,"accessToken");                                 // 사용자 요청으로부터 엑세스 토큰을 가져온다.
         if (accessToken != null)
         {
             try {

@@ -10,4 +10,6 @@ import lombok.*;
 public class LoginDTO {
     private long cntCartItems;
     private boolean master;
+    private String email;
+    private String password;
 }

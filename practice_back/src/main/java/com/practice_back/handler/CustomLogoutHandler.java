@@ -26,7 +26,7 @@ public class CustomLogoutHandler implements LogoutHandler {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 인증 객체 검증
-        String accessToken = tokenProvider.getAccessToken(request);                                 // 사용자 요청으로부터 엑세스 토큰을 가져온다.
+        String accessToken = tokenProvider.getToken(request,"accessToken");                                 // 사용자 요청으로부터 엑세스 토큰을 가져온다.
         if(accessToken != null && accessToken.length()>11){
             // 로그아웃 로직
             tokenProvider.cookieReset(response,"accessToken");

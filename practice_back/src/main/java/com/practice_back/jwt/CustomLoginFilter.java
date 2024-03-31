@@ -29,7 +29,7 @@ import static com.practice_back.handler.HandlerFunc.handlerException;
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider tokenProvider;
     private final CartRepository cartRepository;
-    @Setter
+    @Setter // WebSecurityConfig에서 bean생성한 것에 대해 의존성 주입을 위해 사용
     AuthenticationManager authenticationManager;
     public CustomLoginFilter(TokenProvider tokenProvider, CartRepository cartRepository){
         this.tokenProvider = tokenProvider;
@@ -82,8 +82,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String email = principal.getUsername();
 
-        String accessToken = tokenProvider.ceateAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
-        tokenProvider.saveCookie(response,"accessToken",accessToken); // 응답에 토큰을 저장한다.
+        String accessToken = tokenProvider.createAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장한다.
         long cntCartItems = cartRepository.countItemsByMemberEmail(email);
         boolean master = authorities.contains("ROLE_ADMIN");
         LoginDTO loginDTO = LoginDTO.builder()

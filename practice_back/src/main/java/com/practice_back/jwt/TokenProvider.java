@@ -45,6 +45,8 @@ public class TokenProvider {
     private String BEARER_TYPE; // Bearer는 OAuth 2.0  표준에서 정의된 인증 스키마이다.
     @Value("${token.accessTokenExpireTime}")
     private Integer ACCESS_TOKEN_EXPIRE_TIME;
+    @Value("${token.tempTokenExpireTime}")
+    private Integer TEMP_TOKEN_EXPIRE_TIME;
 
     /*
     * Key 객체는 JWT 토큰 생성에 사용되며 Key객체를 사용함으로 JWT가 변조되지 않았고, 해당 서버에서만 생성되었음을 보증한다.
@@ -68,7 +70,7 @@ public class TokenProvider {
     }
 
     // 엑세스 토큰 생성
-    public String ceateAccessToken(String email, String auth)
+    public String createAccessToken(String email, String auth)
     {
         /*
         * 토큰 생성시 토큰에 세션 정보도 포함가능하다(클레임사용) 아래 코드 예시
@@ -82,21 +84,35 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)// JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
                 .compact();// 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
     }
+    // temp 토큰 생성
+    public String createTempToken(String email)
+    {
+        return Jwts.builder()// JWT를 생성하는 빌더 패턴을 시작.
+                .setSubject(email)// 토큰의 "sub"(subject) 클레임을 설정한다. sub 클레임은 토큰의 주체를 식별하는 데 사용되며, 일반적으로 사용자 ID나 이메일 주소와 같은 고유한 식별자를 사용함
+                .claim(AUTHORITIES_KEY , "ROLE_USER") // claim(String, Object): 사용자 정의 클레임을 설정. 이 메소드는 키-값 쌍으로 클레임을 추가하며, 여기서는 사용자의 권한을 나타내는 auth 값을 AUTHORITIES_KEY라는 키와 함께 저장
+                .setExpiration(new Date((new Date()).getTime() + TEMP_TOKEN_EXPIRE_TIME)) // 토큰의 만료 시간을 설정. 현재 시간에서 ACCESS_TOKEN_EXPIRE_TIME(밀리초 단위)을 더하여 만료 시간을 지정
+                .signWith(key, SignatureAlgorithm.HS512)// JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
+                .compact();// 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
+    }
 
     // 토큰을 쿠키에 저장할 수 있도록 응답에 쿠키 저장
-    public void saveCookie(HttpServletResponse response , String cookieName, String token){
+    public void saveCookie(HttpServletResponse response , String cookieName, String token, int flag){
+        int MAX_AGE = ACCESS_TOKEN_EXPIRE_TIME;
+        if(flag == 2){
+            MAX_AGE = TEMP_TOKEN_EXPIRE_TIME;
+        }
         ResponseCookie cookie =ResponseCookie.from(cookieName, token)
                 .domain("localhost")
                 .sameSite("Lax") // Lax, None, Strict
        //         .secure(true)//메서드를 호출하여 쿠키가 HTTPS를 통해서만 전송되도록 함. 개발환경에서는 비활성화, 비활성화 하면서 httpOnly가 true이면 sameSite는 None으로할 수 없다.
                 .httpOnly(true)// JavaScript가 쿠키에 접근하지 못하도록 설정,XSS 공격으로부터 쿠키를 보호
                 .path("/")
-                .maxAge(ACCESS_TOKEN_EXPIRE_TIME/1000)// 쿠키의 유효 시간 설정
+                .maxAge(MAX_AGE/1000)// 쿠키의 유효 시간 설정
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    // JWT 토큰을 검증하기 위한 함수
+    // Access 토큰을 검증하기 위한 함수
     public boolean validateToken(HttpServletResponse response, String token) throws Exception {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -106,8 +122,17 @@ public class TokenProvider {
         } catch (Exception e) {
             handlerException(response, ErrorType.BAD_REQUEST);
         }
-
         return false;
+    }
+    // Temp 토큰을 검증하기 위한 함수
+    public boolean validateTmpToken(String token){
+        boolean bool = true;
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        }catch (Exception e) {
+            bool = false;
+        }
+        return bool;
     }
 
 
@@ -135,7 +160,7 @@ public class TokenProvider {
     }
 
     // Jwt토큰(엑세스토큰)을 claims 형태로 만드는 함수.
-    public Claims parseClaims(String accessToken)
+    public Claims parseClaims(String tokenName)
     {
         try{
             // JwtParserBuilder 인스턴스 생성 및 서명 키 설정
@@ -143,26 +168,27 @@ public class TokenProvider {
                                 .setSigningKey(key)
                                 .build();
 
-            // accessToken 파싱하여 Claims 객체 반환, getBody 함수로 Claims 부분을 추출
-            return parser.parseClaimsJws(accessToken).getBody();
+            // 전달된 토큰 이름을 파싱하여 Claims 객체 반환, getBody 함수로 Claims 부분을 추출
+            return parser.parseClaimsJws(tokenName).getBody();
         }catch(ExpiredJwtException e){
             return e.getClaims();// 토큰이 만료된 경우, 만료된 토큰의 Claims 반환
         }
     }
 
-    // 사용자의 요청에서 토큰을 꺼내오는 함수
-    public String getAccessToken(HttpServletRequest request){
+    // 사용자의 요청에서 엑세스 토큰을 꺼내오는 함수
+    public String getToken(HttpServletRequest request, String tokenName){
         Cookie[] cookies = request.getCookies();
         String token = null;
         if(cookies != null){
             for(Cookie cookie : cookies){
-                if("accessToken".equals(cookie.getName())){
+                if(tokenName.equals(cookie.getName())){
                     token = cookie.getValue();
                 }
             }
         }
         return token;
     }
+
     // 쿠키 리셋
     public void cookieReset(HttpServletResponse response, String tokenName)
     {
