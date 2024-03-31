@@ -1,7 +1,9 @@
 package com.practice_back.api;
 
 import com.practice_back.dto.EmailDTO;
+import com.practice_back.dto.LoginDTO;
 import com.practice_back.dto.MemberDTO;
+import com.practice_back.dto.UserProfileDTO;
 import com.practice_back.entity.Authority;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
@@ -12,12 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
@@ -72,4 +72,22 @@ public class AuthController
         return emailAuthService.sendNewPassword(emailDto.getEmail());
     }
 
+    /**
+     * Temp Token 발급( 회원정보 수정시 사용 )
+     *
+     * @return 성공 유무를 담은 ResponseEntity
+     * */
+    @PostMapping("/temptoken")
+    public ResponseEntity<Object> gettemptoken(HttpServletResponse response, @RequestBody LoginDTO loginDTO){
+        return authService.gettemptoken(response, loginDTO);
+    }
+    /**
+     * Temp Token 유효성 검사
+     *
+     * @return 성공 유무를 담은 ResponseEntity
+     * */
+    @GetMapping("/validatetmptoken")
+    public ResponseEntity<Object> validateTmpToken(HttpServletRequest request){
+        return authService.validateTmpToken(request);
+    }
 }

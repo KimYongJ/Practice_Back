@@ -73,16 +73,10 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
      *    http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
      * }
      */
-    /*
-    * 특정 경로에 대해 필터를 작동하지 않게 하기 위한 설정예시
-    * */
-    //    @Bean
-    //    public WebSecurityCustomizer webSecurityCustomizer(){
-    //        return web -> {web.ignoring().antMatchers("/api/auth/login"); };
-    //    }
+
     /*
      * [ authenticationManager ]
-     * - AuthenticationManager는 스프링 시큐리티에서 자동으로 Bean으로 등록되지 않기 때문에 직접 주입할 수 없다. 직접 생성해줘야함.
+     * - AuthenticationManager는 스프링 시큐리티에서 자동으로 Bean으로 등록되지 않기 때문에 직접 주입할 수 없다. 직접 생성해줘야한다.
      * */
     @Bean
     public AuthenticationManager authenticationManager(

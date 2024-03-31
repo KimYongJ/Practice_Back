@@ -11,6 +11,7 @@ import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +51,12 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return ResponseEntity<Object>
      * */
-    public ResponseEntity<Object> updateProfile(UserProfileDTO userProfileDTO){
+    public ResponseEntity<Object> updateProfile(HttpServletRequest request, UserProfileDTO userProfileDTO){
+        String tmpToken = tokenProvider.getToken(request, "tempToken");
+        if(tmpToken == null){
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
+        }
         String email = getCurrentMemberInfo();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
@@ -65,19 +71,25 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return ResponseEntity<Object>
      * */
-    public ResponseEntity<Object> updatePassword(PasswordDTO passwordDTO){
+    public ResponseEntity<Object> updatePassword(HttpServletRequest request,PasswordDTO passwordDTO){
+        String tmpToken = tokenProvider.getToken(request, "tempToken");
+        if(tmpToken == null){
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
+        }
         String email = getCurrentMemberInfo();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(()->new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
 
-        String nowPwd = passwordDTO.getNowPassword();
         String newPwd = passwordDTO.getNewPassword();
         String comPwd = passwordDTO.getNewPasswordConfirm();
-        if(nowPwd.equals(newPwd) || !newPwd.equals(comPwd)
-        || !passwordEncoder.matches(nowPwd, member.getPassword()) )
+        if(!newPwd.equals(comPwd))
         {
             return ResponseEntity.badRequest()
                     .body(new Message(ErrorType.INVALID_PASSWORD, "유효하지 않은 비밀번호입니다.", null));
+        }else if(passwordEncoder.matches(newPwd, member.getPassword()) ){
+            return ResponseEntity.badRequest()
+                    .body(new Message(ErrorType.PASSWORD_NO_CHANGE, "기존 비밀번호와 같습니다. 다른 비밀번호를 사용해주세요.", null));
         }
         else {
             member.changePassword(passwordEncoder.encode(newPwd));

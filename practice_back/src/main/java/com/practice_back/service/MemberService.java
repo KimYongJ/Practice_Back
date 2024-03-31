@@ -16,6 +16,6 @@ public interface MemberService {
     Optional<Member> findByEmail(String email);
     public ResponseEntity<Object> deleteByEmail(HttpServletRequest request, HttpServletResponse response);
     public ResponseEntity<Object> getUserProfile();
-    public ResponseEntity<Object> updateProfile(UserProfileDTO userProfileDTO);
-    public ResponseEntity<Object> updatePassword(PasswordDTO passwordDTO);
+    public ResponseEntity<Object> updateProfile(HttpServletRequest request,UserProfileDTO userProfileDTO);
+    public ResponseEntity<Object> updatePassword(HttpServletRequest request,PasswordDTO passwordDTO);
 }
