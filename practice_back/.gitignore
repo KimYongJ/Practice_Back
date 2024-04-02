@@ -12,6 +12,8 @@ build/
 src/main/resources/application.yml
 application.yml
 aws.yml
+application-oauth.yml
+*.yml
 
 ### STS ###
 .apt_generated
