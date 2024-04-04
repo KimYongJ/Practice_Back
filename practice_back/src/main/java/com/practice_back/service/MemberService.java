@@ -11,9 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 public interface MemberService {
-    boolean existsByEmail(String email);
-    Member save(Member memeber);
-    Optional<Member> findByEmail(String email);
     public ResponseEntity<Object> deleteByEmail(HttpServletRequest request, HttpServletResponse response);
     public ResponseEntity<Object> getUserProfile();
     public ResponseEntity<Object> updateProfile(HttpServletRequest request,UserProfileDTO userProfileDTO);

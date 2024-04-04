@@ -30,9 +30,9 @@ import static com.practice_back.jwt.TokenProvider.getCurrentMemberInfo;
 @Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-    private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;      // 비밀번호 저장시 암호화를 위해 사용
+    private final MemberRepository  memberRepository;
+    private final TokenProvider     tokenProvider;
+    private final PasswordEncoder   passwordEncoder;
     /**
      * 회원 정보 조회
      *
@@ -97,34 +97,6 @@ public class MemberServiceImpl implements MemberService {
             return ResponseEntity.ok()
                     .body(new Message(ErrorType.OK, "변경되었습니다.", null));
         }
-    }
-    /**
-    * 회원 가입시 이메일이 존재하는지 확인하는 함수
-    *
-    * @return boolean
-    * */
-    @Override
-    public boolean existsByEmail(String email){
-        return memberRepository.existsByEmail(email);
-    }
-
-    /**
-    *  이메일로 member 객체 조회
-    *
-    * @return Optional<Member>
-    * */
-    @Override
-    public Optional<Member> findByEmail(String email){
-        return memberRepository.findByEmail(email);
-    }
-    /**
-    * 회원 저장 함수
-    *
-    * @return Member
-    * */
-    @Override
-    public Member save(Member memeber) {
-        return memberRepository.save(memeber);
     }
 
     /**

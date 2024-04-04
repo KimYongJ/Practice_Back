@@ -18,8 +18,8 @@ import java.util.NoSuchElementException;
 @Setter
 @Entity                                     // 엔티티임을 알리는 어노테이션
 @Builder                                    // 빌더
-@AllArgsConstructor                         // 모든 필드 값을 파라미터로 받는 생성자를 만들어줌
 @NoArgsConstructor                          // 파라미터가 없는 기본 생성자 생성
+@AllArgsConstructor                         // 모든 필드 값을 파라미터로 받는 생성자를 만들어줌
 public class Member extends BaseAudit{
 
     @Id
@@ -69,7 +69,9 @@ public class Member extends BaseAudit{
                                         .findFirst()
                                         .map(DeliveryAddress::toDTO)
                                         .orElse(new DeliveryAddressDTO());
+        boolean master = member.getAuthority().name().equals("ROLE_ADMIN");
         return UserProfileDTO.builder()
+                .master(master)
                 .email(member.getEmail())
                 .phoneNumber(member.getPhoneNumber())
                 .deliveryAddressDTO(delAddDTO)
@@ -81,6 +83,7 @@ public class Member extends BaseAudit{
                 .authority(member.getAuthority())
                 .build();
     }
+
     public void changePassword(String newPassword){
         this.password = newPassword;
     }
