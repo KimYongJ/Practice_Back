@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-@RestController // @Controller와 @ResponseBody 어노테이션의 기능 결합
+@RestController                     //@Controller와 @ResponseBody 어노테이션의 기능 결합
 @RequestMapping("/api/user/member")
 @RequiredArgsConstructor
 public class MemberController {

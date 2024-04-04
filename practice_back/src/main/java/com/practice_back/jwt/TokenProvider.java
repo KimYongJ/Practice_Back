@@ -4,10 +4,7 @@ import com.practice_back.response.ErrorType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import org.springframework.aop.ThrowsAdvice;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,12 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.CookieGenerator;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,22 +72,22 @@ public class TokenProvider {
         * HttpServletRequest request // String sessionId = request.getSession().getId();
         * .claim("SESSION_ID", sessionId) // 세션 ID를 토큰에 포함 코드
         * */
-        return Jwts.builder()// JWT를 생성하는 빌더 패턴을 시작.
-                .setSubject(email)// 토큰의 "sub"(subject) 클레임을 설정한다. sub 클레임은 토큰의 주체를 식별하는 데 사용되며, 일반적으로 사용자 ID나 이메일 주소와 같은 고유한 식별자를 사용함
-                .claim(AUTHORITIES_KEY , auth) // claim(String, Object): 사용자 정의 클레임을 설정. 이 메소드는 키-값 쌍으로 클레임을 추가하며, 여기서는 사용자의 권한을 나타내는 auth 값을 AUTHORITIES_KEY라는 키와 함께 저장
+        return Jwts.builder()
+                .setSubject(email)                                                          // 토큰의 "sub"(subject) 클레임을 설정한다. sub 클레임은 토큰의 주체를 식별하는 데 사용되며, 일반적으로 사용자 ID나 이메일 주소와 같은 고유한 식별자를 사용함
+                .claim(AUTHORITIES_KEY , auth)                                              // claim(String, Object): 사용자 정의 클레임을 설정. 이 메소드는 키-값 쌍으로 클레임을 추가하며, 여기서는 사용자의 권한을 나타내는 auth 값을 AUTHORITIES_KEY라는 키와 함께 저장
                 .setExpiration(new Date((new Date()).getTime() + ACCESS_TOKEN_EXPIRE_TIME)) // 토큰의 만료 시간을 설정. 현재 시간에서 ACCESS_TOKEN_EXPIRE_TIME(밀리초 단위)을 더하여 만료 시간을 지정
-                .signWith(key, SignatureAlgorithm.HS512)// JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
-                .compact();// 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
+                .signWith(key, SignatureAlgorithm.HS512)                                    // JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
+                .compact();                                                                 // 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
     }
     // temp 토큰 생성
     public String createTempToken(String email)
     {
-        return Jwts.builder()// JWT를 생성하는 빌더 패턴을 시작.
-                .setSubject(email)// 토큰의 "sub"(subject) 클레임을 설정한다. sub 클레임은 토큰의 주체를 식별하는 데 사용되며, 일반적으로 사용자 ID나 이메일 주소와 같은 고유한 식별자를 사용함
-                .claim(AUTHORITIES_KEY , "ROLE_USER") // claim(String, Object): 사용자 정의 클레임을 설정. 이 메소드는 키-값 쌍으로 클레임을 추가하며, 여기서는 사용자의 권한을 나타내는 auth 값을 AUTHORITIES_KEY라는 키와 함께 저장
-                .setExpiration(new Date((new Date()).getTime() + TEMP_TOKEN_EXPIRE_TIME)) // 토큰의 만료 시간을 설정. 현재 시간에서 ACCESS_TOKEN_EXPIRE_TIME(밀리초 단위)을 더하여 만료 시간을 지정
-                .signWith(key, SignatureAlgorithm.HS512)// JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
-                .compact();// 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
+        return Jwts.builder()
+                .setSubject(email)
+                .claim(AUTHORITIES_KEY , "ROLE_USER")
+                .setExpiration(new Date((new Date()).getTime() + TEMP_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
 
     // 토큰을 쿠키에 저장할 수 있도록 응답에 쿠키 저장

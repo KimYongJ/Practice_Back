@@ -13,8 +13,8 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @Getter
-@EntityListeners(AuditingEntityListener.class) // JPA 엔티티가 생성되거나 수정될 때 자동으로 해당 필드들을 채워주는 리스너를 등록하는 역할
 @MappedSuperclass           // 이 클래스가 다른 엔티티 클래스의 기본 클래스로 사용됨을 나타내며, 이 클래스의 필드들이 테이블에 매핑될 때 포함되도록 함
+@EntityListeners(AuditingEntityListener.class) // JPA 엔티티가 생성되거나 수정될 때 자동으로 해당 필드들을 채워주는 리스너를 등록하는 역할
 public class BaseAudit {
     @CreatedDate            // 엔티티가 생성되거나 수정된 날짜를 자동으로 기록
     @Column(name = "insert_dts", updatable = false)

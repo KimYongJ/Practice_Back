@@ -5,11 +5,11 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoginDTO {
-    private long cntCartItems;
+    private long    cntCartItems;
     private boolean master;
-    private String email;
-    private String password;
+    private String  email;
+    private String  password;
 }

@@ -1,12 +1,18 @@
 package com.practice_back.config;
 import com.practice_back.handler.AuthenticationEntryPointHandler;
 import com.practice_back.handler.CustomAccessDeniedHandler;
+import com.practice_back.handler.CustomAuthenticationSuccessHandler;
 import com.practice_back.handler.CustomLogoutHandler;
 import com.practice_back.jwt.AccessTokenFilter;
 import com.practice_back.jwt.CustomLoginFilter;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.CartRepository;
+import com.practice_back.service.AuthService;
+import com.practice_back.service.MemberService;
+import com.practice_back.service.impl.AuthServiceImpl;
 import com.practice_back.service.impl.MemberServiceImpl;
+import com.practice_back.service.impl.OAuth2AuthorizationRequestResolverImpl;
+import com.practice_back.service.impl.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +26,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -57,22 +65,13 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
  * - 어플리케이션에서 이 어노테이션은 한번만 써야한다. 여러번 쓰면 스프링이 어떤 것을 우선으로 할지 결정하지 못하므로 한번만 쓰는것을 권장 한다.
  * */
 @EnableWebSecurity
-public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
-    private final CustomLogoutHandler customLogoutHandler;
-    private final TokenProvider tokenProvider;
-    private final CartRepository cartRepository;
-    /*
-     * [ configure 함수 설명 ]
-     * - 해당 함수는  HTTP 요청에 대한 보안 요구 사항(인증 방식, 접근 권한, CSRF 보호 등)을 사용자가 원하는 대로 설정하고 특정 필터를 보안 필터 체인에 추가하는 역할을 한다.
-     * - 해당 함수의 실행순서 : 애플리케이션 시작시 스프링 시큐리티는 초기화 되는데 이 과정에서 SecurityConfigurerAdapter클래스를 상속받은 클래스의 configure 함수가 호출된다.
-     *                       configure 함수에 정의된 설정은 스프링 시큐리티의 보안 필터체인에 적용된다. 이 필터 체인은 들어오는 HTTP 요청을 처리하며, 각 요청에 대해 설정된 커스텀 보안 정책을 적용함.
-     *
-     * @Override
-     * public void configure(HttpSecurity http) {
-     *    AccessTokenFilter customFilter = new AccessTokenFilter(tokenProvider,tokenDataRepository);
-     *    http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
-     * }
-     */
+public class WebSecurityConfig {
+    private final TokenProvider                         tokenProvider;
+    private final CartRepository                        cartRepository;
+    private final CustomLogoutHandler                   customLogoutHandler;
+    private final OAuth2UserServiceImpl                 oAuth2UserServiceImpl;
+    private final ClientRegistrationRepository          clientRegistrationRepository;
+    private final CustomAuthenticationSuccessHandler    customAuthenticationSuccessHandler;
 
     /*
      * [ authenticationManager ]
@@ -82,19 +81,6 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-
-    /*
-     * [ passwordEncoder 빈등록 설명 ]
-     * - passwordEncoder() 함수를 빈으로 등록해놓고 사용한다.(가독성을 위해서..)
-     * - 사용자 회원가입시 비밀번호를 그냥 저장하지 않고 해당 인코더를 사용해 암호화 한 후 저장한다.(DB에는 암호화된 데이터가 저장됨)
-     * - 사용 예시 : passwordEncoder.encode(password) // 반환된 문자열을 그대로 DB에 저장
-     * - BCryptPasswordEncoder : 복호화가 불가능한 인코딩 방법으로 BCrypt 해싱 알고리즘을 사용. 해시 속도를 조절할 수 있으며 브루트 포스 공격에 강하고 해시 결과가 각각 다른 솔트(salt)를 사용하기 때문에 동일한 비밀번호라도 해시 값이 다름
-     * */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     /*
@@ -123,21 +109,18 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
      * */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpsecurity) throws Exception { // 이 메소드는 스프링 시큐리트의 핵심 구성 요소 중 하나이다. 이 메소드는 스프링 부트의 자동 구성과정 중 스프링 시큐리티에 의해 호출됨
-        AuthenticationManager authManager = authenticationManager(httpsecurity.getSharedObject(AuthenticationConfiguration.class));
+        AuthenticationManager authManager   = authenticationManager(httpsecurity.getSharedObject(AuthenticationConfiguration.class));
         CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider, cartRepository);
         customLoginFilter.setAuthenticationManager(authManager);
-
-        return httpsecurity
+        httpsecurity
                 .authorizeRequests()
                 // 시큐리티 적용 순서 : 세부 권한 설정 후 permitAll등 더 넓은 권한 설정해야함
-                .antMatchers(HttpMethod.POST, "/api/user/items/**").hasRole("ADMIN") // hasAnyRole, hasRole 함수는 시큐리티가 자동으로 ROLE_ 접두사를 붙임
-                .antMatchers(HttpMethod.PUT, "/api/user/items/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PATCH, "/api/user/items/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,   "/api/user/items/**").hasRole("ADMIN") // hasAnyRole, hasRole 함수는 시큐리티가 자동으로 ROLE_ 접두사를 붙임
+                .antMatchers(HttpMethod.PUT,    "/api/user/items/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PATCH,  "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/user/items/**").hasRole("ADMIN")
-                .antMatchers("/api/user/items/**", "/api/user/category", "/api/auth/signup","/api/auth/newpassword").permitAll()
-                .antMatchers("/api/user/member").authenticated()  // 로그인한 사용자만 접근 가능
-                // 그 외 모든 요청은 인증이 필요함
-                .anyRequest().authenticated()
+                .antMatchers("/api/user/items/**","/auth/google", "/api/user/category", "/api/auth/signup","/api/auth/newpassword").permitAll()
+                .anyRequest().authenticated()// 그 외 모든 요청은 인증이 필요함
                 .and()
                 .logout() // 스프링 시큐리티는 /logout 경로로 오는 post요청에 대해 .logout()을 실행한다.
                     .logoutUrl("/api/auth/logout") // 커스텀 로그아웃 URL 설정
@@ -156,6 +139,21 @@ public class WebSecurityConfig { //extends SecurityConfigurerAdapter<DefaultSecu
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)// REST API를 통해 세션 없이 토큰을 주고받으며 데이터를 주고받기 때문에 세션설정은 STATELESS로 설정.
                 .and()
-                .build();
+                .oauth2Login(oauth2Login ->
+                        oauth2Login.authorizationEndpoint(authorizationEndpointConfig ->
+                                authorizationEndpointConfig.authorizationRequestResolver(
+                                        new OAuth2AuthorizationRequestResolverImpl(
+                                                new DefaultOAuth2AuthorizationRequestResolver(
+                                                        clientRegistrationRepository, "/oauth2/authorization"
+                                                )
+                                        )
+                                )
+                        )
+                                .successHandler(customAuthenticationSuccessHandler)
+                                .userInfoEndpoint()                     // 사용자 정보를 가져오기 위한 설정을 시작합니다. 이설정을 통해 userService() 호출해 oAuth2UserServiceImpl 사용
+                                .userService(oAuth2UserServiceImpl)     // 사용자 정보를 가져오기 위해 OAuth2UserService 커스터마이징한 OAuth2UserServiceImpl를 호출하도록함
+                ); // OAuth2 로그인을 활성화합니다.
+
+        return httpsecurity.build();
     }
 }

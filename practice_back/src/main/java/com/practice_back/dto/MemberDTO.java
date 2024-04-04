@@ -42,7 +42,7 @@ public class MemberDTO {
                 .build();
     }
 
-    public Member toMemberSignUp(PasswordEncoder passwordEncoder) {
+    public Member toMemberSignUp(Authority authority,PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
