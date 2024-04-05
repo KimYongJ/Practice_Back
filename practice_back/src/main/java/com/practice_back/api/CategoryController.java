@@ -4,7 +4,6 @@ import com.practice_back.dto.CategoryDTO;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.CategoryService;
-import com.practice_back.service.impl.CategoryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

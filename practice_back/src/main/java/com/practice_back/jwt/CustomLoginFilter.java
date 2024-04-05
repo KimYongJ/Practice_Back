@@ -27,18 +27,18 @@ import static com.practice_back.handler.HandlerFunc.handlerException;
 
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
-    private final TokenProvider tokenProvider;
-    private final CartRepository cartRepository;
+    private final TokenProvider     tokenProvider;
+    private final CartRepository    cartRepository;
     @Setter // WebSecurityConfig에서 bean생성한 것에 대해 의존성 주입을 위해 사용
-    AuthenticationManager authenticationManager;
+    AuthenticationManager           authenticationManager;
     public CustomLoginFilter(TokenProvider tokenProvider, CartRepository cartRepository){
-        this.tokenProvider = tokenProvider;
+        this.tokenProvider  = tokenProvider;
         this.cartRepository = cartRepository;
         super.setFilterProcessesUrl("/api/auth/login"); // 로그인시 전달될 커스텀 api를 정의 한다.
     }
 
 
-    /*
+    /**
     * [ attemptAuthentication 함수 ]
     * - 사용자가 POST 요청으로 로그인 정보를 전송할 때 이 메소드가 호출 된다.
     * - 스프링 시큐리티는 UsernamePasswordAuthenticationToken을 사용해 인증을 수행하며 해당 함수에서 AuthenticationManager를 통해 Authentication를 생성하면
@@ -54,45 +54,45 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             throw new RuntimeException(e);
         }
         // 사용자가 입력한 아이디와 비밀번호를 가져옴
-        String email =(String) result.get("email");
-        String password =(String) result.get("password");
+        String email    = (String)result.get("email");
+        String password = (String)result.get("password");
 
         // UsernamePasswordAuthenticationToken 객체를 생성하고,
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
-        /*
+        /**
         * 로그인 유저의 검증은 AuthenticationManager가 처리한다.
         * AuthenticationManager는 스프링 시큐리티의 필터에서 인증된 값을 정의하는 API로 SecurityContextHolder에 인증 값을 저장한다.
         * */
         return authenticationManager.authenticate(authRequest);// 로그인 유저의 검증은 AuthenticationManager가 처리한다.
     }
 
-    /*
+    /**
     * 로그인 성공시 호출되는 함수
     * */
     @Override
-    public void successfulAuthentication(HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         FilterChain chain,
-                                         Authentication authentication) throws IOException{
+    public void successfulAuthentication(HttpServletRequest     request,
+                                         HttpServletResponse    response,
+                                         FilterChain            chain,
+                                         Authentication         authentication)
+            throws IOException
+    {
         // 로그인에 성공한 유저
-        UserDetails principal = (UserDetails)authentication.getPrincipal();
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        String email = principal.getUsername();
-
-        String accessToken = tokenProvider.createAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        UserDetails principal   = (UserDetails)authentication.getPrincipal();
+        String authorities      = authentication.getAuthorities().stream()
+                                    .map(GrantedAuthority::getAuthority)
+                                    .collect(Collectors.joining(","));
+        String email            = principal.getUsername();
+        String accessToken      = tokenProvider.createAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        long cntCartItems       = cartRepository.countItemsByMemberEmail(email);
+        boolean master          = authorities.contains("ROLE_ADMIN");
+        LoginDTO loginDTO       = LoginDTO.builder()
+                                    .cntCartItems(cntCartItems)
+                                    .master(master)
+                                    .build();
         tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장한다.
-        long cntCartItems = cartRepository.countItemsByMemberEmail(email);
-        boolean master = authorities.contains("ROLE_ADMIN");
-        LoginDTO loginDTO = LoginDTO.builder()
-                .cntCartItems(cntCartItems)
-                .master(master)
-                .build();
         handlerException(response, ErrorType.LOGIN_SUCCESS, loginDTO);
     }
-    /*
+    /**
     * 로그인 실패시 호출되는 함수
     * */
     @Override
@@ -125,8 +125,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             }
         }
 
-
-        ObjectMapper mapper = new ObjectMapper(); 												// 문자열을 키, 벨류 형태로 바꾸기 위해 맵퍼 사용
+        ObjectMapper mapper = new ObjectMapper(); 											// 문자열을 키, 벨류 형태로 바꾸기 위해 맵퍼 사용
         Map<String, Object> resultMap = mapper.readValue(sb.toString(), Map.class);			// 문자열 형태를 키:벨류 형태인 해시맵으로 변환한다.
         return resultMap;
     }

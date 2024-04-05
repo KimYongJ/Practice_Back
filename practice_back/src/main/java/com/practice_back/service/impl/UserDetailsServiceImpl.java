@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor // 클래스 내에 final 키워드가 붙거나 @NonNull 어노테이션이 붙은 필드들을 인자로 하는 생성자를 자동으로 생성
-/*
+/**
  * [ UserDetailsService 구현 이유 ]
  * - 스프링 시큐리티는 사용자의 인증 정보를 조회하는 로직을 UserDetailsService 인터페이스를 통해 제공함.
  * - 개발자는 이 인터페이스를 구현해 데이터베이스에서 사용자 정보를 조회하는 로직을 작성해야 한다.
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final MemberRepository memberrepository;
 
-    /*
+    /**
      * [ loadUserByUsername 함수 ]
      * - 이 함수는 데이터베이스에서 사용자 정보를 조회한 후 이를 UserDetails 객체로 반환한다. 반환된 UserDetails 객체에는 id,pw,권한 등이 포함된다.
      * - 호출 순서 : AuthenticationManager는 UserDetailsService을 구현한 클래스를 찾아 AuthenticationProvider를 사용해 loadUserByUsername 함수를 호출한다.
@@ -40,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
     }
 
-    /*
+    /**
     * [ createUserDetails 함수 ]
     * - 인자로 전달된 객체에서 ID, PW, 권한을 뽑아내 UserDetails객체로 만들어 반환한다.
     * - GrantedAuthority : 스프링 시큐리티에서 권한을 나타내는 인터페이스이며 이 인터페이스의 구현체는 사용자 권한을 나타내고, 스프링 시큐리티는 이 권한 정보를 사용해 권한에 기반한 접근 제어를 수행한다.

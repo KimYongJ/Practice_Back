@@ -3,17 +3,13 @@ package com.practice_back.api;
 import com.practice_back.dto.EmailDTO;
 import com.practice_back.dto.LoginDTO;
 import com.practice_back.dto.MemberDTO;
-import com.practice_back.dto.UserProfileDTO;
-import com.practice_back.entity.Authority;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.AuthService;
 import com.practice_back.service.EmailAuthService;
-import com.practice_back.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,15 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Map;
 
 @RestController // @Controller와 @ResponseBody 어노테이션의 기능 결합
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController
 {
-    private final AuthService authService;
-    private final EmailAuthService emailAuthService;
+    private final AuthService       authService;
+    private final EmailAuthService  emailAuthService;
     /**
     * 회원가입
     *
@@ -53,12 +48,12 @@ public class AuthController
         * 여기서는 사용자의 이메일을 path 변수로 사용하여 URI를 구성, 프론트에서 생성된 경로로 리다이렉트 할 수 있음 ex)window.location.href = response.headers.location;
         * */
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath() // 현재 컨텍스트 경로(예: http://localhost:8080)를 기준으로
-                .path("/api/user/member/{email}")// 경로를 설정합니다. {email}은 path 변수
-                .buildAndExpand(resultDTO.getEmail())// path 변수 {username}에 실제 사용자 이름을 바인
-                .toUri();// 최종적으로 URI 객체를 생성
+                .fromCurrentContextPath()               // 현재 컨텍스트 경로(예: http://localhost:8080)를 기준으로
+                .path("/api/user/member/{email}")       // 경로를 설정합니다. {email}은 path 변수
+                .buildAndExpand(resultDTO.getEmail())   // path 변수 {username}에 실제 사용자 이름을 바인
+                .toUri();                               // 최종적으로 URI 객체를 생성
 
-        return ResponseEntity.created(location) // 생성된 리소스에 대한 참조로 URI를 포함하여 201 Created 응답을 반환
+        return ResponseEntity.created(location)         // 생성된 리소스에 대한 참조로 URI를 포함하여 201 Created 응답을 반환
                 .body(new Message(ErrorType.SIGNUP_SUCCESS, "회원가입 성공",resultDTO));
 
     }

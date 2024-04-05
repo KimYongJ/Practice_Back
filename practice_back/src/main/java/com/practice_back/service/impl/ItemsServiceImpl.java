@@ -23,10 +23,8 @@ import java.util.List;
 @Transactional
 public class ItemsServiceImpl implements ItemsService {
 
-
     private final ItemsRepository itemsRepository;
 
-    // 모든 아이템 조회 함수
     @Override
     public ResponseEntity<Object> getItems(Long itemId, List<Long> category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable)
     {
@@ -36,7 +34,6 @@ public class ItemsServiceImpl implements ItemsService {
                 .body(new Message(ErrorType.OK, "조회 성공", items));
     }
 
-    // 아이템 PK값으로 조회하는 함수
     @Override
     public ResponseEntity<Object> getItemsByItemId(Long itemId){
         ItemsDTO itemDTO = Items.toDTO(itemsRepository.findByItemId(itemId));

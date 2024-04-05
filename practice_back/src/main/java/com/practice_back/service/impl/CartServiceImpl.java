@@ -31,34 +31,30 @@ import static com.practice_back.jwt.TokenProvider.getCurrentMemberInfo;
 @Transactional
 public class CartServiceImpl implements CartService {
 
-    private final CartRepository cartRepository;
-    private final ItemsRepository itemsRepository;
-    private final CartItemRepository cartItemRepository;
+    private final CartRepository        cartRepository;
+    private final ItemsRepository       itemsRepository;
+    private final CartItemRepository    cartItemRepository;
 
     @Override
     public ResponseEntity<Object> getCartByEmail(){
-        String email = getCurrentMemberInfo();
+        String email    = getCurrentMemberInfo();
         CartDTO cartDTO = cartRepository.findByMemberEmail(email).map(Cart::toDTO)
-                .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
+                             .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"성공", cartDTO ));
     }
     @Override
     public ResponseEntity<Object> countCartItems() {
-        String email = getCurrentMemberInfo();
-
-        long cnt = cartRepository.countItemsByMemberEmail(email);
-
+        String email    = getCurrentMemberInfo();
+        long cnt        = cartRepository.countItemsByMemberEmail(email);
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"성공", cnt ));
     }
     @Override
     public ResponseEntity<Object> insertCartItem(Integer quantity, Long itemId){
-        String email = getCurrentMemberInfo();
-        // Member의 email을 기준으로 Cart 찾기
-        Cart cart = cartRepository.findByMemberEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
-
+        String email    = getCurrentMemberInfo();
+        Cart cart       = cartRepository.findByMemberEmail(email)
+                            .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
         // 상품이 이미 담겼는지 체크
         boolean bool = cartItemRepository.existsByCartIdAndItemsItemId(cart.getId(), itemId);
         if(bool){
@@ -83,7 +79,7 @@ public class CartServiceImpl implements CartService {
 
         cartItemList.add(cartitem);
 
-        Cart updatedCart = cartRepository.save(cart); // 업데이트된 Cart 저장
+        cartRepository.save(cart); // 업데이트된 Cart 저장
 
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"카트에 추가하였습니다.", null ));
@@ -126,8 +122,7 @@ public class CartServiceImpl implements CartService {
         ErrorType error = bool ? ErrorType.OK : ErrorType.BAD_REQUEST;
 
         return ResponseEntity.ok()
-                .body(new Message(error
-                        ,error.getErrStr(),null));
+                .body(new Message(error,error.getErrStr(),null));
     }
 
 

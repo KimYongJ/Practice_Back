@@ -1,4 +1,5 @@
 package com.practice_back.config;
+
 import com.practice_back.handler.AuthenticationEntryPointHandler;
 import com.practice_back.handler.CustomAccessDeniedHandler;
 import com.practice_back.handler.CustomAuthenticationSuccessHandler;
@@ -7,10 +8,6 @@ import com.practice_back.jwt.AccessTokenFilter;
 import com.practice_back.jwt.CustomLoginFilter;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.CartRepository;
-import com.practice_back.service.AuthService;
-import com.practice_back.service.MemberService;
-import com.practice_back.service.impl.AuthServiceImpl;
-import com.practice_back.service.impl.MemberServiceImpl;
 import com.practice_back.service.impl.OAuth2AuthorizationRequestResolverImpl;
 import com.practice_back.service.impl.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;

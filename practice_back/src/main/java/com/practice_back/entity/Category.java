@@ -17,10 +17,9 @@ public class Category extends BaseAudit{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private Long categoryId;                // 카테고리 고유 번호
-
+    private Long    categoryId;             // 카테고리 고유 번호
     @Column(name = "category_title",nullable=false)
-    private String categoryTitle;           // 카테고리 제목( ex 국내차용품 ~ DIY용품 )
+    private String  categoryTitle;          // 카테고리 제목( ex 국내차용품 ~ DIY용품 )
 
 
     public static CategoryDTO toDTO(Category category)

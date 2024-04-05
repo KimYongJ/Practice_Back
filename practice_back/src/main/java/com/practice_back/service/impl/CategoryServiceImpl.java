@@ -19,7 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    /*
+    /**
     * 모든 카테고리를 조회
     *
     * @return List<CategoryDTO>
