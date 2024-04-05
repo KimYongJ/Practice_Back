@@ -15,7 +15,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class DeliveryAddressDTO {
 
-
     private Long deliveryAddressId;
     @NotBlank(message = "수령인을 입력해주세요.")
     @Size(min = 1, max = 10, message = "수령인은 1자 이상 10자 미만이어야 합니다.")
@@ -40,7 +39,6 @@ public class DeliveryAddressDTO {
     @Size(max = 50, message = "상세 주소는 50자를 넘을 수 없습니다.")
     @Pattern(regexp = "^[가-힣a-zA-Z0-9\\s]+$", message = "상세 주소는 특수문자를 포함할 수 없으며, 한글, 영어, 숫자, 공백만 가능합니다.")
     private String addressDetail;
-
 
     private Boolean isPrimary = false;  // 기본 배송지 여부
 

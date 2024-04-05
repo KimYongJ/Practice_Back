@@ -24,9 +24,9 @@ import java.util.Random;
 @Transactional
 public class EmailAuthServiceImpl implements EmailAuthService {
 
-    private final JavaMailSenderImpl mailSender;        // Spring Framework에서 제공하는 메일 발송 객체
-    private final MemberRepository memberRepository;    // 변경된 비밀번호를 저장하기 위해 사용
-    private final PasswordEncoder passwordEncoder;      // 비밀번호 저장시 암호화를 위해 사용
+    private final JavaMailSenderImpl    mailSender;        // Spring Framework에서 제공하는 메일 발송 객체
+    private final MemberRepository      memberRepository;  // 변경된 비밀번호를 저장하기 위해 사용
+    private final PasswordEncoder       passwordEncoder;   // 비밀번호 저장시 암호화를 위해 사용
     private final ArrayList<String> charList = new ArrayList<String>(){{
         add("abcdefghijklmnopqrstuvwxyz");
         add("ABCDEFGHIJKLMNOPQRSTUVWXYZ");

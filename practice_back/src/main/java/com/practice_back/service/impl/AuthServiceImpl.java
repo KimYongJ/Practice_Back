@@ -74,13 +74,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<Object> validateTmpToken(HttpServletRequest request){
-        String tmpToken = tokenProvider.getToken(request, "tempToken");
         ErrorType errorType;
-        boolean isValidate = tokenProvider.validateTmpToken(tmpToken);
+        String tmpToken     = tokenProvider.getToken(request, "tempToken");
+        boolean isValidate  = tokenProvider.validateTmpToken(tmpToken);
         if(isValidate){
-            errorType = ErrorType.VALID_TOKEN;
+            errorType       = ErrorType.VALID_TOKEN;
         }else{
-            errorType = ErrorType.INVALID_TOKEN;
+            errorType       = ErrorType.INVALID_TOKEN;
         }
         return ResponseEntity.ok()
                 .body(new Message(errorType, errorType.toString(), isValidate));

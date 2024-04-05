@@ -17,20 +17,20 @@ import javax.persistence.*;
 public class CartItem extends BaseAudit{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long    id;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")           // cart테이블의 cart_id를 참조
     @JsonIgnore // 이 필드를 JSON 직렬화 과정에서 무시합니다.
-    private Cart cart;
+    private Cart    cart;
 
     @ManyToOne
     @JoinColumn(name = "item_id")           // items테이블의 item_id를 참조
-    private Items items;
+    private Items   items;
 
-    private int quantity;                   // 상품 수량
+    private int     quantity;                   // 상품 수량
 
-    private long totalPrice;                // 상품 수량에 따른 총금액
+    private long    totalPrice;                // 상품 수량에 따른 총금액
 
     public static CartItemDTO toDTO(CartItem cartItem){
         return CartItemDTO.builder()

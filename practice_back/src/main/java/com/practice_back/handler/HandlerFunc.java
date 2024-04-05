@@ -25,7 +25,6 @@ public class HandlerFunc {
     }
     public static void handlerException(HttpServletResponse response, ErrorType error,Object object)
     {
-
         try {
             response.setStatus(error.getStatusCode());
             response.setContentType("application/json;charset=UTF-8");

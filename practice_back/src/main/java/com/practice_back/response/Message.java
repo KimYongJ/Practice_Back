@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data // Getter , Setter, toString, equals, hashCode 자동생성
-@AllArgsConstructor // 모든 파라미터를 받는 생성자 자동 생성
+@AllArgsConstructor
 @NoArgsConstructor
 public class Message {
 	

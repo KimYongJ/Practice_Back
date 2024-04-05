@@ -33,26 +33,36 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ // DefaultOAuth2UserService 클래스는  OAuth2UserService<OAuth2UserRequest, OAuth2User> 인터페이스를 구현한 구현체입니다.
     private final PasswordEncoder   passwordEncoder;
     private final MemberRepository  memberRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User           = delegate.loadUser(userRequest);
+        OAuth2User oAuth2User           = super.loadUser(userRequest);
         String registrationId           = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttributeName    = userRequest.getClientRegistration().getProviderDetails()
-                                                .getUserInfoEndpoint().getUserNameAttributeName();
-        OAuthAttributes attributes      = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-        String email                    = attributes.getEmail();
+                                            .getUserInfoEndpoint().getUserNameAttributeName();
+        OAuthAttributes attributes      = null;
+        if("naver".equals(registrationId)){
+            attributes      = OAuthAttributes.naverMemberInfo(userNameAttributeName, oAuth2User.getAttributes());
+        }else if("google".equals(registrationId)){
+            attributes      = OAuthAttributes.googleMemberInfo(userNameAttributeName, oAuth2User.getAttributes());
+        }else if("kakao".equals(registrationId)){
+            attributes      = OAuthAttributes.kakaoMemberInfo(userNameAttributeName, oAuth2User.getAttributes());
+        }else if("github".equals(registrationId)){
+            attributes      = OAuthAttributes.githubMemberInfo(userNameAttributeName, oAuth2User.getAttributes());
+        }
+
+        String email  = attributes.getEmail();
         // email을 통해 멤버를 찾으며 없을 경우 member 데이터 신규 저장
-        if( !memberRepository.existsByEmail(email) ){
+        if( !memberRepository.existsByEmail(email) )
+        {
             insertNewMember(email);
         }
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROL_USER");
         return new DefaultOAuth2User(
                 Collections.singleton(authority),
-                oAuth2User.getAttributes(),
+                attributes.getAttributes(),
                 userNameAttributeName);
     }
 

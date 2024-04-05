@@ -2,10 +2,7 @@ package com.practice_back.api;
 
 import com.practice_back.dto.PasswordDTO;
 import com.practice_back.dto.UserProfileDTO;
-import com.practice_back.response.ErrorType;
-import com.practice_back.response.Message;
 import com.practice_back.service.MemberService;
-import com.practice_back.service.impl.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
