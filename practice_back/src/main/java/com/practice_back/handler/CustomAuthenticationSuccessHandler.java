@@ -2,8 +2,10 @@ package com.practice_back.handler;
 
 import com.practice_back.dto.OAuthAttributes;
 import com.practice_back.jwt.TokenProvider;
+import com.practice_back.response.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -34,29 +36,35 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication
-    ) throws IOException, ServletException
-    {
+    ) throws IOException, ServletException {
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        String registrationId   = oauthToken.getAuthorizedClientRegistrationId();
+        String registrationId = oauthToken.getAuthorizedClientRegistrationId();
         Collection<? extends GrantedAuthority> authorities
-                                = authentication.getAuthorities();// Authentication 객체로부터 권한 정보 get
-        String authorityString  = authorities.isEmpty() ? "" : authorities.iterator().next().getAuthority();// 권한 정보가 비어있지 않은 경우, 첫 번째 권한을 String으로 추출
-        OAuth2User oAuth2User   = (OAuth2User) authentication.getPrincipal();
-        String email        = "";
-        if("naver".equals(registrationId)){
-            email           = OAuthAttributes.getNaverEmail(oAuth2User.getAttributes());
-        }else if("google".equals(registrationId)){
-            email           = OAuthAttributes.getGoogleEmail(oAuth2User.getAttributes());
-        }else if("kakao".equals(registrationId)){
-            email           = OAuthAttributes.getKaKaoEmail(oAuth2User.getAttributes());
-        }else if("github".equals(registrationId)){
-            email           = OAuthAttributes.getGithubEmail(oAuth2User.getAttributes());
+                = authentication.getAuthorities();// Authentication 객체로부터 권한 정보 get
+        String authorityString = authorities.isEmpty() ? "" : authorities.iterator().next().getAuthority();// 권한 정보가 비어있지 않은 경우, 첫 번째 권한을 String으로 추출
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        String email = "";
+        if ("naver".equals(registrationId)) {
+            email = OAuthAttributes.getNaverEmail(oAuth2User.getAttributes());
+        } else if ("google".equals(registrationId)) {
+            email = OAuthAttributes.getGoogleEmail(oAuth2User.getAttributes());
+        } else if ("kakao".equals(registrationId)) {
+            email = OAuthAttributes.getKaKaoEmail(oAuth2User.getAttributes());
+        } else if ("github".equals(registrationId)) {
+            email = OAuthAttributes.getGithubEmail(oAuth2User.getAttributes());
         }
 
-        String accessToken  = tokenProvider.createAccessToken(email, authorityString); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
-        tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장
-        response.setStatus(HttpServletResponse.SC_OK);
-        getRedirectStrategy().sendRedirect(request, response, frontUrl);          // 로그인 성공 후 메인페이지 리디렉션
+        if (email != null && !"".equals(email)){
+            String accessToken = tokenProvider.createAccessToken(email, authorityString); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+            tokenProvider.saveCookie(response, "accessToken", accessToken, 1); // 응답에 토큰을 저장
+            response.setStatus(HttpServletResponse.SC_OK);
+            getRedirectStrategy().sendRedirect(request, response, frontUrl);          // 로그인 성공 후 메인페이지 리디렉션
+        }else{
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\":\"EMAIL_NOT_REGISTERED\",\"message\":\"계정에 등록된 이메일이 없습니다.\"}");
+        }
         //String targetUrl = determineTargetUrl(request, response, authentication); // 사용자가 원래 요청했던 url주소를 찾고싶을 때 쓰는 함수
     }
 }

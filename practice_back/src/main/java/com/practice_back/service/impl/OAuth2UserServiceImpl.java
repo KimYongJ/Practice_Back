@@ -54,10 +54,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ // DefaultO
         }
 
         String email  = attributes.getEmail();
-        // email을 통해 멤버를 찾으며 없을 경우 member 데이터 신규 저장
-        if( !memberRepository.existsByEmail(email) )
+        if(email != null && !memberRepository.existsByEmail(email) )
         {
-            insertNewMember(email);
+            insertNewMember(email);// email을 통해 멤버를 찾으며 없을 경우 member 데이터 신규 저장
         }
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROL_USER");
         return new DefaultOAuth2User(
