@@ -19,4 +19,5 @@ public interface AuthService {
     public ResponseEntity<Object> validateTmpToken(HttpServletRequest request);
 
     public Optional<Member> findByEmail(String email);
+    public ResponseEntity<Object> verifyRecaptcha(Map<String, Object> recaptchaData);
 }

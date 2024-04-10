@@ -113,7 +113,8 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.PUT,    "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PATCH,  "/api/user/items/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/user/items/**").hasRole("ADMIN")
-                .antMatchers("/api/user/items/**","/auth/google", "/api/user/category", "/api/auth/signup","/api/auth/newpassword").permitAll()
+                .antMatchers("/api/user/items/**","/auth/google", "/api/user/category",
+                                        "/api/auth/signup","/api/auth/newpassword", "/api/auth/recaptchaverify").permitAll()
                 .anyRequest().authenticated()// 그 외 모든 요청은 인증이 필요함
                 .and()
                 .logout() // 스프링 시큐리티는 /logout 경로로 오는 post요청에 대해 .logout()을 실행한다.

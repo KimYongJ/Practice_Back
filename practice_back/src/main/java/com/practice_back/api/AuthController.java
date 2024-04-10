@@ -8,6 +8,7 @@ import com.practice_back.response.Message;
 import com.practice_back.service.AuthService;
 import com.practice_back.service.EmailAuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Map;
 
-@RestController // @Controller와 @ResponseBody 어노테이션의 기능 결합
+@RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController
@@ -85,4 +87,15 @@ public class AuthController
     public ResponseEntity<Object> validateTmpToken(HttpServletRequest request){
         return authService.validateTmpToken(request);
     }
+    /**
+     * reCAPTCHA 유효성 검사
+     *
+     * @return 성공 유무를 담은 ResponseEntity
+     * */
+    @PostMapping("/recaptchaverify")
+    public ResponseEntity<Object> verifyRecaptcha(@RequestBody Map<String, Object> recaptchaData){
+        return authService.verifyRecaptcha(recaptchaData);
+    }
+
+
 }
