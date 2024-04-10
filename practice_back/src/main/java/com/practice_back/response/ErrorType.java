@@ -10,6 +10,7 @@ public enum ErrorType {
 		LOGOUT_SUCCESS(200, 			"로그아웃 성공"),
 		LOGIN_SUCCESS(200, 			"로그인 성공"),
 		ACCOUNT_DELETION_SUCCESS(200, "회원 탈퇴 성공"),
+		AUTHENTICATION_SUCCESS(200, 	"인증 수신 완료"),
 		SIGNUP_SUCCESS(201, 			"회원가입 성공"),
 		MOVED_PERMANENTLY(301,		"페이지 이동"),
 	    BAD_REQUEST(400, 				"요청이 부적절 합니다."),

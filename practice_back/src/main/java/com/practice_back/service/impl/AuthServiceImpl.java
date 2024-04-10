@@ -2,40 +2,38 @@ package com.practice_back.service.impl;
 
 import com.practice_back.dto.LoginDTO;
 import com.practice_back.dto.MemberDTO;
-import com.practice_back.dto.UserProfileDTO;
 import com.practice_back.entity.Authority;
-import com.practice_back.entity.Cart;
 import com.practice_back.entity.Member;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.MemberRepository;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.AuthService;
-import com.practice_back.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
+    @Value("${token.recaptchaSecret}")
+    private String                      recaptchaSecret;
+    @Value("${token.recaptchaServerURL}")
+    private String                      recaptchaServerURL;
     private final TokenProvider         tokenProvider;
     private final PasswordEncoder       passwordEncoder;
     private final MemberRepository      memberRepository;
@@ -91,4 +89,22 @@ public class AuthServiceImpl implements AuthService {
         return memberRepository.findByEmail(email);
     }
 
+    @Override
+    public ResponseEntity<Object> verifyRecaptcha(Map<String, Object> recaptchaData){
+        String token                        = (String) recaptchaData.get("token");
+        HttpHeaders httpHeaders             = new HttpHeaders();
+        RestTemplate restTemplate           = new RestTemplate();
+        MultiValueMap<String, String> map   = new LinkedMultiValueMap<>();
+
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        map.add("secret",   recaptchaSecret);
+        map.add("response", token);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, httpHeaders);
+
+        Map<String,Object> response = restTemplate.postForObject(recaptchaServerURL, request, Map.class); // 해당 url로 token과 secret key를 전송. 유효성 검증.
+        boolean bool = (boolean)response.get("success");
+
+        return ResponseEntity.ok()
+                .body(new Message(ErrorType.AUTHENTICATION_SUCCESS,"수신 완료", bool));
+    }
 }
