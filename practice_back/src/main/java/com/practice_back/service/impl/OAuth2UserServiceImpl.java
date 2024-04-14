@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -53,10 +54,15 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ // DefaultO
             attributes      = OAuthAttributes.githubMemberInfo(userNameAttributeName, oAuth2User.getAttributes());
         }
 
-        String email  = attributes.getEmail();
-        if(email != null && !memberRepository.existsByEmail(email) )
+        String email   = attributes.getEmail();
+        String picture = attributes.getPicture();
+        if(email != null)
         {
-            insertNewMember(email);// email을 통해 멤버를 찾으며 없을 경우 member 데이터 신규 저장
+            if(!memberRepository.existsByEmail(email)){
+                insertNewMember(email);// email을 통해 멤버를 찾으며 없을 경우 member 데이터 신규 저장
+            }else{
+                updatePicture(email, picture);
+            }
         }
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROL_USER");
         return new DefaultOAuth2User(
@@ -75,6 +81,12 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ // DefaultO
                                         .build();
         member.getCart()
                 .setMember(member);
+        return memberRepository.save( member );
+    }
+    public Member updatePicture(String email, String picture){
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException(email + "을 DB에서 찾을 수 없습니다."));
+        member.changePicture(picture);
         return memberRepository.save( member );
     }
 }

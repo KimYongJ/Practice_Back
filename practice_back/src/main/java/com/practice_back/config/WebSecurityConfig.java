@@ -8,6 +8,7 @@ import com.practice_back.jwt.AccessTokenFilter;
 import com.practice_back.jwt.CustomLoginFilter;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.CartRepository;
+import com.practice_back.repository.MemberRepository;
 import com.practice_back.service.impl.OAuth2AuthorizationRequestResolverImpl;
 import com.practice_back.service.impl.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+
+import javax.persistence.ManyToOne;
 
 /*
  * [ 스프링 시큐리티 흐름 ]
@@ -62,6 +65,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 public class WebSecurityConfig {
     private final TokenProvider                         tokenProvider;
     private final CartRepository                        cartRepository;
+    private final MemberRepository                      memberRepository;
     private final CustomLogoutHandler                   customLogoutHandler;
     private final OAuth2UserServiceImpl                 oAuth2UserServiceImpl;
     private final ClientRegistrationRepository          clientRegistrationRepository;
@@ -104,7 +108,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpsecurity) throws Exception { // 이 메소드는 스프링 시큐리트의 핵심 구성 요소 중 하나이다. 이 메소드는 스프링 부트의 자동 구성과정 중 스프링 시큐리티에 의해 호출됨
         AuthenticationManager authManager   = authenticationManager(httpsecurity.getSharedObject(AuthenticationConfiguration.class));
-        CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider, cartRepository);
+        CustomLoginFilter customLoginFilter = new CustomLoginFilter(tokenProvider, cartRepository, memberRepository);
         customLoginFilter.setAuthenticationManager(authManager);
         httpsecurity
                 .authorizeRequests()
