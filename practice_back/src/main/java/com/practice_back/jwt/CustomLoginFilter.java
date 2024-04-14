@@ -3,6 +3,7 @@ package com.practice_back.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice_back.dto.LoginDTO;
 import com.practice_back.repository.CartRepository;
+import com.practice_back.repository.MemberRepository;
 import com.practice_back.response.ErrorType;
 import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,11 +30,13 @@ import static com.practice_back.handler.HandlerFunc.handlerException;
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider     tokenProvider;
     private final CartRepository    cartRepository;
+    private final MemberRepository  memberRepository;
     @Setter // WebSecurityConfig에서 bean생성한 것에 대해 의존성 주입을 위해 사용
     AuthenticationManager           authenticationManager;
-    public CustomLoginFilter(TokenProvider tokenProvider, CartRepository cartRepository){
+    public CustomLoginFilter(TokenProvider tokenProvider, CartRepository cartRepository, MemberRepository memberRepository){
         this.tokenProvider  = tokenProvider;
         this.cartRepository = cartRepository;
+        this.memberRepository = memberRepository;
         super.setFilterProcessesUrl("/api/auth/login"); // 로그인시 전달될 커스텀 api를 정의 한다.
     }
 
@@ -82,12 +85,14 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.joining(","));
         String email            = principal.getUsername();
+        String picture          = memberRepository.findPictureByEmail(email);
         String accessToken      = tokenProvider.createAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         long cntCartItems       = cartRepository.countItemsByMemberEmail(email);
         boolean master          = authorities.contains("ROLE_ADMIN");
         LoginDTO loginDTO       = LoginDTO.builder()
                                     .cntCartItems(cntCartItems)
                                     .master(master)
+                                    .picture(picture)
                                     .build();
         tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장한다.
         handlerException(response, ErrorType.LOGIN_SUCCESS, loginDTO);

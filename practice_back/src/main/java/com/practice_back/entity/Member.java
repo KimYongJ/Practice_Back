@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @Getter
-@Setter
 @Entity                                     // 엔티티임을 알리는 어노테이션
 @Builder                                    // 빌더
 @NoArgsConstructor                          // 파라미터가 없는 기본 생성자 생성
@@ -33,6 +32,8 @@ public class Member extends BaseAudit{
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "picture")
+    private String picture;
     /*
     * Cart와 Memeber 엔티티는 1:1 관계이며 Member가 삭제될 때 Cart도 삭제되도록 cascade옵션 활성화(member 엔티티의 모든 변경사항(crud)이 Cart엔티티에도 적용됨
     * orphanRemoval = true 설정 이유 : Member엔티티가 삭제되어 Cart 엔티티가 더이상 참조되지 않는 상태가 되면 자동으로 삭제 하는 코드
@@ -73,6 +74,7 @@ public class Member extends BaseAudit{
         return UserProfileDTO.builder()
                 .master(master)
                 .email(member.getEmail())
+                .picture(member.getPicture())
                 .phoneNumber(member.getPhoneNumber())
                 .deliveryAddressDTO(delAddDTO)
                 .build();
@@ -88,4 +90,5 @@ public class Member extends BaseAudit{
         this.password = newPassword;
     }
     public void changePhoneNumber(String phoneNumber){ this.phoneNumber = phoneNumber;}
+    public void changePicture(String picture){this.picture = picture;}
 }

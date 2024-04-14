@@ -11,5 +11,6 @@ public class LoginDTO {
     private long    cntCartItems;
     private boolean master;
     private String  email;
+    private String  picture;
     private String  password;
 }
