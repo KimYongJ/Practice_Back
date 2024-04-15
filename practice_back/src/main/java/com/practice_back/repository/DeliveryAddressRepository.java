@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository //인터페이스가 저장소(Repository) 역할을 하며, 스프링에 의해 관리되는 빈임을 나타냄
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
-    List<DeliveryAddress> findByMemberEmail(String email);
-    Optional<DeliveryAddress> findByDeliveryAddressIdAndMemberEmail(Long deliveryAddressId, String email);
+    List<DeliveryAddress> findByMemberId(String Id);
+    Optional<DeliveryAddress> findByDeliveryAddressIdAndMemberId(Long deliveryAddressId, String id);
 }

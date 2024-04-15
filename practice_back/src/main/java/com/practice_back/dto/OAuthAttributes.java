@@ -17,6 +17,7 @@ public class OAuthAttributes {
     private String email;
     private String picture;
 
+
     public static String getNaverEmail( Map<String, Object> attributes){
         Map<String, Object> response = (Map<String, Object>)attributes.get("response");
         return (String) response.get("email");
@@ -37,7 +38,7 @@ public class OAuthAttributes {
         Map<String, Object> kakao_account = (Map<String, Object>)attributes.get("kakao_account");
         return OAuthAttributes.builder()
                 .name((String) properties.get("nickname"))
-                .email((String) kakao_account.get("email"))// 카카오 이메일은 가져오기 위해 별도 승인이 필요해  nickname으로 대체개발
+                .email((String) kakao_account.get("email"))
                 .picture((String) properties.get("profile_image"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)

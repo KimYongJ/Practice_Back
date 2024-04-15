@@ -21,7 +21,7 @@ public class DeliveryAddress extends BaseAudit{
     private Long deliveryAddressId;
 
     @ManyToOne
-    @JoinColumn(name = "email")
+    @JoinColumn(name = "id")
     @JsonIgnoreProperties("deliveryAddresses")
     private Member member;
 

@@ -22,7 +22,7 @@ public class Cart extends BaseAudit{
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "member_email", referencedColumnName = "email")
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
     @JsonIgnoreProperties("cart") // Member 엔티티 내의 cart 필드를 직렬화에서 제외(순환 참조 방지로 Cart클래스가 Member를 불러올 때 Member안에 Cart엔티티는 불러오지 않음.)
     private Member member;
 

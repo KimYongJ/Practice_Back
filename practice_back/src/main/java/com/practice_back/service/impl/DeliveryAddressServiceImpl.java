@@ -26,8 +26,8 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     private final MemberRepository memberRepo;
     @Override
     public ResponseEntity<Object> getAllDeliveryInfo() {
-        String email = getCurrentMemberInfo();
-        List<DeliveryAddressDTO> listDTO = delRepo.findByMemberEmail(email).stream()
+        String Id = getCurrentMemberInfo();
+        List<DeliveryAddressDTO> listDTO = delRepo.findByMemberId(Id).stream()
                 .map(DeliveryAddress::toDTO)
                 .collect(Collectors.toList());
 
@@ -36,9 +36,9 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     }
     @Override
     public ResponseEntity<Object> insertDeliveryInfo(DeliveryAddressDTO deliveryAddressDTO) {
-        String email = getCurrentMemberInfo();
-        Member member = memberRepo.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));;
+        String ID = getCurrentMemberInfo();
+        Member member = memberRepo.findById(ID)
+                .orElseThrow(()-> new UsernameNotFoundException(ID + " 을 DB에서 찾을 수 없습니다"));;
 
         int size = member.getDeliveryAddresses().size();
 
@@ -66,8 +66,8 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     }
     @Override
     public ResponseEntity<Object> patchDeliveryInfo(DeliveryAddressDTO deliveryAddressDTO) {
-        String email = getCurrentMemberInfo();
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberEmail(deliveryAddressDTO.getDeliveryAddressId(), email)
+        String Id = getCurrentMemberInfo();
+        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberId(deliveryAddressDTO.getDeliveryAddressId(), Id)
                 .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressDTO.getDeliveryAddressId()));
 
         deliveryAddress.update(deliveryAddressDTO);
@@ -79,8 +79,8 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
 
     @Override
     public ResponseEntity<Object> patchDeliveryPrimary(DeliveryAddressDTO deliveryAddressDTO) {
-        String email = getCurrentMemberInfo();
-        List<DeliveryAddress> addresses = delRepo.findByMemberEmail(email);
+        String Id = getCurrentMemberInfo();
+        List<DeliveryAddress> addresses = delRepo.findByMemberId(Id);
 
         // 기존 배송지 비활성화
         addresses.stream()
@@ -101,9 +101,9 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
 
     @Override
     public ResponseEntity<Object> deleteDeliveryInfo(Long deliveryAddressId) {
-        String email = getCurrentMemberInfo();
+        String Id = getCurrentMemberInfo();
         // ID로 배송지 정보 찾기
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberEmail(deliveryAddressId, email)
+        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberId(deliveryAddressId, Id)
                 .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressId));
 
         // 배송지 정보 삭제

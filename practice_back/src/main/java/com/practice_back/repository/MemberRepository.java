@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository //인터페이스가 저장소(Repository) 역할을 하며, 스프링에 의해 관리되는 빈임을 나타냄
+@Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
     /**
     *  [ Optional ]
@@ -16,10 +16,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     *  - Optional은 예상치 못한 NullPointerException을 피하게 하며 메소드의 실행 결과값이 없을 수 있음을 명시적으로 표현하는 역할을 함
     *  - Optional 사용시 특정 동작을 수행하는 함수를 전용으로 제공한다( ifPresent(), orElse(), orElseThrow() 등 . )
     * */
-    Optional<Member> findByEmail(String email); // 이메일을 기준으로 Member 조회
-    boolean existsByEmail(String email);
+    Optional<Member> findById(String id);
+    boolean existsById(String Id);
     Member save(Member member);
-    int deleteByEmail(String email);
-    @Query("SELECT m.picture from Member m WHERE m.email =:email")
-    String findPictureByEmail(@Param("email")String email);
+    int deleteById(String Id);
+    @Query("SELECT m.picture from Member m WHERE m.id =:id")
+    String findPictureById(@Param("id")String id);
 }

@@ -84,10 +84,10 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         String authorities      = authentication.getAuthorities().stream()
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.joining(","));
-        String email            = principal.getUsername();
-        String picture          = memberRepository.findPictureByEmail(email);
-        String accessToken      = tokenProvider.createAccessToken(email, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
-        long cntCartItems       = cartRepository.countItemsByMemberEmail(email);
+        String Id               = principal.getUsername();
+        String picture          = memberRepository.findPictureById(Id);
+        String accessToken      = tokenProvider.createAccessToken(Id, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        long cntCartItems       = cartRepository.countItemsByMemberId(Id);
         boolean master          = authorities.contains("ROLE_ADMIN");
         LoginDTO loginDTO       = LoginDTO.builder()
                                     .cntCartItems(cntCartItems)
