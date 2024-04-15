@@ -1,12 +1,10 @@
 package com.practice_back.handler;
 
-import com.practice_back.dto.OAuthAttributes;
 import com.practice_back.entity.Oauth2.Oauth2UserInfo;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.service.impl.FactoryUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
