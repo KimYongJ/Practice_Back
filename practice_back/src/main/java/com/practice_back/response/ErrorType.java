@@ -2,8 +2,10 @@ package com.practice_back.response;
 
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public enum ErrorType {
 	 	OK(200, 						"성공"),
 		VALID_TOKEN(200, 				"유효한 토큰입니다."),
@@ -28,7 +30,7 @@ public enum ErrorType {
 		DUPLICATE_EMAIL(409, 			"이미 가입된 이메일입니다."),
 		DUPLICATE_ITEM(409, 			"이미 카트에 추가된 상품 입니다."),
 	    INTERNAL_SERER_ERROR(500, 	"서버 문제로 응답할 수 없습니다.");
-		
+
 	    int statusCode;
 	    String errStr;
 

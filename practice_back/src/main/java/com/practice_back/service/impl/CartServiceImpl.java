@@ -37,23 +37,23 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<Object> getCartByEmail(){
-        String email    = getCurrentMemberInfo();
-        CartDTO cartDTO = cartRepository.findByMemberEmail(email).map(Cart::toDTO)
-                             .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
+        String Id    = getCurrentMemberInfo();
+        CartDTO cartDTO = cartRepository.findByMemberId(Id).map(Cart::toDTO)
+                             .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"성공", cartDTO ));
     }
     @Override
     public ResponseEntity<Object> countCartItems() {
-        String email    = getCurrentMemberInfo();
-        long cnt        = cartRepository.countItemsByMemberEmail(email);
+        String Id    = getCurrentMemberInfo();
+        long cnt        = cartRepository.countItemsByMemberId(Id);
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"성공", cnt ));
     }
     @Override
     public ResponseEntity<Object> insertCartItem(Integer quantity, Long itemId){
-        String email    = getCurrentMemberInfo();
-        Cart cart       = cartRepository.findByMemberEmail(email)
+        String Id    = getCurrentMemberInfo();
+        Cart cart       = cartRepository.findByMemberId(Id)
                             .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
         // 상품이 이미 담겼는지 체크
         boolean bool = cartItemRepository.existsByCartIdAndItemsItemId(cart.getId(), itemId);
@@ -87,9 +87,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<Object> updateCartItem(Integer quantity, Long itemId) {
-        String email = getCurrentMemberInfo();
+        String Id = getCurrentMemberInfo();
 
-        Cart cart = cartRepository.findByMemberEmail(email)
+        Cart cart = cartRepository.findByMemberId(Id)
                 .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
 
         Items item = itemsRepository.findById(itemId)
@@ -111,9 +111,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<Object> deleteCartItem(Long itemId) {
-        String email = getCurrentMemberInfo();
+        String Id = getCurrentMemberInfo();
 
-        Cart cart = cartRepository.findByMemberEmail(email)
+        Cart cart = cartRepository.findByMemberId(Id)
                 .orElseThrow(()-> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
 
         boolean bool = cart.getCartItems()

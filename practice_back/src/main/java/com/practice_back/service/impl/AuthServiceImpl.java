@@ -65,9 +65,9 @@ public class AuthServiceImpl implements AuthService {
                 .body(new Message(ErrorType.MOVED_PERMANENTLY, "확인 완료.","account"));
     }
     @Override
-    public boolean existsByEmail(String email)
+    public boolean existsByEmail(String Id)
     {
-        return memberRepository.existsByEmail(email);
+        return memberRepository.existsById(Id);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<Member> findByEmail(String email){
-        return memberRepository.findByEmail(email);
+    public Optional<Member> findById(String Id){
+        return memberRepository.findById(Id);
     }
 
     @Override

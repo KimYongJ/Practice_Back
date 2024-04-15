@@ -54,7 +54,7 @@ public class MemberController {
      * */
     @DeleteMapping()
     public ResponseEntity<Object> deleteUser(HttpServletRequest request, HttpServletResponse response){
-        return memberService.deleteByEmail(request, response);
+        return memberService.deleteById(request, response);
     }
 
 

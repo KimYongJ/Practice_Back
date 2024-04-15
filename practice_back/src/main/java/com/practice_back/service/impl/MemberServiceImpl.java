@@ -39,9 +39,9 @@ public class MemberServiceImpl implements MemberService {
      * @return ResponseEntity<Object>
      * */
     public ResponseEntity<Object> getUserProfile(){
-        String email = getCurrentMemberInfo();
-        UserProfileDTO userProfileDTO = memberRepository.findByEmail(email).map(Member::toDTO)
-                .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
+        String Id = getCurrentMemberInfo();
+        UserProfileDTO userProfileDTO = memberRepository.findById(Id).map(Member::toDTO)
+                .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
 
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"조회 완료",userProfileDTO));
@@ -57,9 +57,9 @@ public class MemberServiceImpl implements MemberService {
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
         }
-        String email = getCurrentMemberInfo();
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
+        String Id = getCurrentMemberInfo();
+        Member member = memberRepository.findById(Id)
+                .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
 
         String phoneNumber = userProfileDTO.getPhoneNumber();
         member.changePhoneNumber(phoneNumber);
@@ -77,9 +77,9 @@ public class MemberServiceImpl implements MemberService {
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
         }
-        String email = getCurrentMemberInfo();
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException(email + " 을 DB에서 찾을 수 없습니다"));
+        String Id = getCurrentMemberInfo();
+        Member member = memberRepository.findById(Id)
+                .orElseThrow(()->new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
 
         String newPwd = passwordDTO.getNewPassword();
         String comPwd = passwordDTO.getNewPasswordConfirm();
@@ -105,9 +105,9 @@ public class MemberServiceImpl implements MemberService {
      * @return ResponseEntity<Object>
      * */
     @Override
-    public ResponseEntity<Object> deleteByEmail(HttpServletRequest request, HttpServletResponse response){
-        String email = getCurrentMemberInfo();
-        int num =  memberRepository.deleteByEmail(email);
+    public ResponseEntity<Object> deleteById(HttpServletRequest request, HttpServletResponse response){
+        String Id = getCurrentMemberInfo();
+        int num =  memberRepository.deleteById(Id);
         boolean bool = num > 0;
 
         ErrorType error = bool ? ErrorType.ACCOUNT_DELETION_SUCCESS : ErrorType.BAD_REQUEST;

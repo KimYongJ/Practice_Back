@@ -39,15 +39,15 @@ public class EmailAuthServiceImpl implements EmailAuthService {
      * @param email 수신자 이메일 주소
      */
     @Override
-    public ResponseEntity<Object> sendNewPassword(String email){
-        if(!memberRepository.existsByEmail(email)){
+    public ResponseEntity<Object> sendNewPassword(String Id){
+        if(!memberRepository.existsById(Id)){
             return ResponseEntity.badRequest()
-                    .body(new Message(ErrorType.EMAIL_NOT_FOUND, "해당하는 이메일이 없습니다.", email));
+                    .body(new Message(ErrorType.EMAIL_NOT_FOUND, "해당하는 이메일이 없습니다.", Id));
         }
 
         String newPassword = generateRandomPassword();
         String content = buildEmailContent(newPassword);
-        return sendEmail(email, "임시 비밀번호 발급 이메일 입니다.", content, newPassword);
+        return sendEmail(Id, "임시 비밀번호 발급 이메일 입니다.", content, newPassword);
     }
 
     /**
@@ -114,7 +114,7 @@ public class EmailAuthServiceImpl implements EmailAuthService {
             mailSender.send(message);
 
             // email로 맴버를 찾음 -> entity비번 변경 -> save
-            Member member = memberRepository.findByEmail(email)
+            Member member = memberRepository.findById(email)
                     .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
             member.changePassword( passwordEncoder.encode(newPassword) );
             memberRepository.save(member);

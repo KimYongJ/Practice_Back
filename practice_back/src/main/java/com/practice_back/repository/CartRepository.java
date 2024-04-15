@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    Optional<Cart> findByMemberEmail(String email);
+    Optional<Cart> findByMemberId(String Id);
     Cart save(Cart cart);
-    @Query("SELECT COUNT(ci) FROM CartItem ci WHERE ci.cart.member.email = :email")
-    long countItemsByMemberEmail(@Param("email") String email);
+    @Query("SELECT COUNT(ci) FROM CartItem ci WHERE ci.cart.member.id = :id")
+    long countItemsByMemberId(@Param("id") String id);
 }

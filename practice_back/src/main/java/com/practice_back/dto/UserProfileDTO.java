@@ -16,5 +16,6 @@ public class UserProfileDTO {
     private String  phoneNumber;
     private String picture;
     private boolean master;
+    private String providerId;
     private DeliveryAddressDTO deliveryAddressDTO;
 }
