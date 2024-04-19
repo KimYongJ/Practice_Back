@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -26,6 +28,7 @@ public class CartItem extends BaseAudit{
 
     @ManyToOne
     @JoinColumn(name = "item_id")           // items테이블의 item_id를 참조
+    @OnDelete(action =OnDeleteAction.CASCADE)
     private Items   items;
 
     private int     quantity;                   // 상품 수량

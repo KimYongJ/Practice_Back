@@ -16,15 +16,11 @@ import javax.validation.constraints.NotNull;
 public class ItemsDTO {
 
     private Long        itemId;          // 아이템의 고유 번호
-
     private String      imgUrl;          // 이미지 주소
-    private String      imgBase64;       // Base64 인코딩된 이미지 데이터를 문자열로 저장
     @NotBlank(message = "상품명을 입력해주세요.")
     private String      itemTitle;       // 아이템 이름
-
     @NotNull(message = "상품 가격을 입력해주세요.")
     private Long        itemPrice;       // 아이템 가격
-
     private CategoryDTO categoryDTO;     // 아이템 카테고리( ex 국내차용품 ~ DIY용품 )
 
     public static Items toEntity(ItemsDTO itemsDTO){
