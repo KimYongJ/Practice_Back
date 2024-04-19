@@ -1,5 +1,6 @@
 package com.practice_back.handler;
 
+import com.practice_back.exception.InvalidImageFileException;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +63,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAllExceptions(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<String> handleIOException(IOException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
+    }
+    @ExceptionHandler(InvalidImageFileException.class)
+    public ResponseEntity<String> handleInvalidImageFile(InvalidImageFileException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
 }

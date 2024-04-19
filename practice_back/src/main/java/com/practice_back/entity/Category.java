@@ -21,7 +21,6 @@ public class Category extends BaseAudit{
     @Column(name = "category_title",nullable=false)
     private String  categoryTitle;          // 카테고리 제목( ex 국내차용품 ~ DIY용품 )
 
-
     public static CategoryDTO toDTO(Category category)
     {
         return CategoryDTO.builder()

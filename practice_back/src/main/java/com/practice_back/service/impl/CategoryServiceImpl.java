@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,5 +31,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll()
                 .stream().map(Category::toDTO)
                 .collect(Collectors.toList());
+    }
+    /**
+     * ID로 카테고리 조회
+     *
+     * @return Optional<Category>
+     * */
+    @Override
+    public Optional<Category> findById(Long id){
+        return categoryRepository.findById(id);
     }
 }

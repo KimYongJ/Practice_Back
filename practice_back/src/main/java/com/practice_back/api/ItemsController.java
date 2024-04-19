@@ -8,7 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -74,8 +76,13 @@ public class ItemsController {
      * @return 저장한 아이템 결과를 담은 ResponseEntity
      */
     @PostMapping
-    public ResponseEntity<Object> insertItem(@RequestBody ItemsDTO itemsDTO){
-        return itemsService.insertItem(itemsDTO);
+    public ResponseEntity<Object> insertItem(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("title") String title,
+            @RequestParam("price") String price,
+            @RequestParam("categoryId") String categoryId
+    )throws Exception {
+        return itemsService.insertItem(file,title,price,categoryId);
     }
 
     /**
@@ -85,8 +92,14 @@ public class ItemsController {
      * @return 변경한 아이템 결과를 담은 ResponseEntity
      */
     @PatchMapping
-    public ResponseEntity<Object> updateItem(@RequestBody ItemsDTO itemsDTO){
-        return itemsService.updateItem(itemsDTO);
+    public ResponseEntity<Object> updateItem(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam("title") String title,
+            @RequestParam("price") String price,
+            @RequestParam("itemid") String itemid,
+            @RequestParam("imgurl") String imgurl
+    )throws Exception{
+        return itemsService.updateItem(file, title, price, itemid, imgurl);
     }
     /**
      * 관리자 권한으로 Item 정보 삭제
