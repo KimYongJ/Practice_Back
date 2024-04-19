@@ -18,7 +18,7 @@ public class ItemsDTO {
     private Long        itemId;          // 아이템의 고유 번호
 
     private String      imgUrl;          // 이미지 주소
-
+    private String      imgBase64;       // Base64 인코딩된 이미지 데이터를 문자열로 저장
     @NotBlank(message = "상품명을 입력해주세요.")
     private String      itemTitle;       // 아이템 이름
 

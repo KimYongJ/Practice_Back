@@ -1,5 +1,6 @@
 package com.practice_back.service.impl;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.practice_back.dto.CategoryDTO;
 import com.practice_back.dto.ItemsDTO;
 import com.practice_back.entity.Category;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ItemsServiceImpl implements ItemsService {
 
     private final ItemsRepository itemsRepository;
-
+    private final ImageServiceImpl imageServiceImple;
     @Override
     public ResponseEntity<Object> getItems(Long itemId, List<Long> category, String itemTitle, Long startPrice, Long endPrice, Pageable pageable)
     {
@@ -43,9 +44,12 @@ public class ItemsServiceImpl implements ItemsService {
     @Override
     public ResponseEntity<Object> insertItem(ItemsDTO itemsDTO){
         Category category = CategoryDTO.toEntity(itemsDTO.getCategoryDTO());
+
+        String imageUrl = imageServiceImple.uploadImageToS3(itemsDTO.getImgBase64());
+
         Items items = Items.builder()
                 .itemTitle(itemsDTO.getItemTitle())
-                .imgUrl(itemsDTO.getImgUrl())
+                .imgUrl(imageUrl)
                 .itemPrice(itemsDTO.getItemPrice())
                 .category(category)
                 .build();
@@ -57,9 +61,13 @@ public class ItemsServiceImpl implements ItemsService {
     @Override
     public ResponseEntity<Object> updateItem(ItemsDTO dto){
         ItemsDTO itemsDTO = Items.toDTO(itemsRepository.getById(dto.getItemId()));
+        String newImageUrl = dto.getImgUrl();
+        if(dto.getImgBase64().length() > 10) {
+            newImageUrl = imageServiceImple.updaetImageOnS3(itemsDTO.getImgUrl(), dto.getImgBase64());
+        }
         itemsDTO.setItemTitle(dto.getItemTitle());
         itemsDTO.setItemPrice(dto.getItemPrice());
-        itemsDTO.setImgUrl(dto.getImgUrl());
+        itemsDTO.setImgUrl(newImageUrl);
         itemsDTO = Items.toDTO(itemsRepository.save(ItemsDTO.toEntity(itemsDTO)));
 
         return ResponseEntity.ok()
@@ -68,6 +76,8 @@ public class ItemsServiceImpl implements ItemsService {
 
     @Override
     public ResponseEntity<Object> deleteItem(Long itemId){
+        String imageUrl = itemsRepository.getById(itemId).getImgUrl();
+        imageServiceImple.deleteImageFromS3(imageUrl);
         itemsRepository.deleteById(itemId);
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK, "삭제했습니다.", 1));
