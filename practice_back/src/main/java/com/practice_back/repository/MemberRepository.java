@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,9 +18,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     *  - Optional 사용시 특정 동작을 수행하는 함수를 전용으로 제공한다( ifPresent(), orElse(), orElseThrow() 등 . )
     * */
     Optional<Member> findById(String id);
+
+    List<Member> findAllByEmailIn(List<String> email);
     boolean existsById(String Id);
     Member save(Member member);
     int deleteById(String Id);
     @Query("SELECT m.picture from Member m WHERE m.id =:id")
-    String findPictureById(@Param("id")String id);
+    String findPictureById(@Param("id")String id); // ClassCastException 오류를 막기위해 JPA 작명 규칙이 아닌 어노테이션으로 사용
 }
