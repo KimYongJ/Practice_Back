@@ -19,14 +19,10 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot
 	implementation 		'org.springframework.boot:spring-boot-starter-mail' 			// 메일 발송을 위해 추가
 	implementation 		'org.springframework.boot:spring-boot-starter-data-jpa' 		// JPA
 	implementation 		'org.springframework.boot:spring-boot-starter-web'
-	implementation 		'mysql:mysql-connector-java' 									// MySql
-	compileOnly 		'org.projectlombok:lombok'
-	developmentOnly 	'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 	'org.springframework.boot:spring-boot-starter-test'
 	implementation 		'org.springframework.boot:spring-boot-starter-validation' 		// 유효성검사시사용
 	implementation 		'org.springframework.boot:spring-boot-starter-security' 		// 스프링시큐리티 적용( starter-security사용시 스프링 부트 버전 2.7.7에 맞는 스프링 시큐리티 버전이 자동으로 사용 )
 	implementation 		'org.springframework.boot:spring-boot-starter-oauth2-client' 	// oauth2-client 라이브러리
@@ -35,6 +31,18 @@ dependencies {
 	runtimeOnly 		'io.jsonwebtoken:jjwt-jackson:0.11.2' 							// JSON 처리를 위한 Jackson 라이브러리 지원
 	implementation 		'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
 	implementation 		'org.apache.commons:commons-imaging:1.0-alpha2'
+	developmentOnly 	'org.springframework.boot:spring-boot-devtools'
+
+	// DB
+	implementation 		'mysql:mysql-connector-java' 									// MySql
+	runtimeOnly			'com.h2database:h2'
+
+	// lombok
+	compileOnly 		'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// test
+	testImplementation 	'org.springframework.boot:spring-boot-starter-test'				// // JUnit 5 , AssertJ 포함
 }
 
 tasks.named('test') {

@@ -67,7 +67,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     @Override
     public ResponseEntity<Object> patchDeliveryInfo(DeliveryAddressDTO deliveryAddressDTO) {
         String Id = getCurrentMemberInfo();
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberId(deliveryAddressDTO.getDeliveryAddressId(), Id)
+        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressId(deliveryAddressDTO.getDeliveryAddressId())
                 .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressDTO.getDeliveryAddressId()));
 
         deliveryAddress.update(deliveryAddressDTO);
@@ -103,7 +103,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     public ResponseEntity<Object> deleteDeliveryInfo(Long deliveryAddressId) {
         String Id = getCurrentMemberInfo();
         // ID로 배송지 정보 찾기
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressIdAndMemberId(deliveryAddressId, Id)
+        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressId(deliveryAddressId)
                 .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressId));
 
         // 배송지 정보 삭제

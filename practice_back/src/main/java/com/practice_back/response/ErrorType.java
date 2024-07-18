@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum ErrorType {
 	 	OK(200, 						"성공"),
 		VALID_TOKEN(200, 				"유효한 토큰입니다."),

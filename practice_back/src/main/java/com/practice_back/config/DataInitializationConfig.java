@@ -33,7 +33,7 @@ public class DataInitializationConfig {
                     .build();
             master.getCart()
                     .setMember(master);
-            memberRepository.save(master);
+           // memberRepository.save(master);
         }
     }
 }
