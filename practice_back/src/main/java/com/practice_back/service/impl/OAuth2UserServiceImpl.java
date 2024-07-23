@@ -6,6 +6,7 @@ import com.practice_back.entity.Cart;
 import com.practice_back.entity.Member;
 import com.practice_back.entity.Oauth2.Oauth2UserInfo;
 import com.practice_back.repository.MemberRepository;
+import com.practice_back.service.impl.FactoryUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ /** 주석 2*/
     private final PasswordEncoder   passwordEncoder;
     private final MemberRepository  memberRepository;
-    private final FactoryUserInfo   factoryUserInfo;
+    private final FactoryUserInfo factoryUserInfo;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User           = super.loadUser(userRequest);

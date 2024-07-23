@@ -8,13 +8,13 @@ import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.CategoryService;
 import com.practice_back.service.ItemsService;
+import com.practice_back.service.impl.ImageServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;

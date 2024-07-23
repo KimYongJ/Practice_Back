@@ -41,20 +41,20 @@ class ItemsRepositoryTest {
         Category category = createTempCategory();
         Items item1 = createItem("사과",500L,"www.naver.com",category);
         Items item2 = createItem("배",1500L,"naver",category);
-        itemsRepository.save(item1);
-        itemsRepository.save(item2);
+        item1 = itemsRepository.save(item1);
+        item2 = itemsRepository.save(item2);
         // When
-        Items result1 = itemsRepository.findByItemId(1L);
-        Items result2 = itemsRepository.findByItemId(2L);
+        Items result1 = itemsRepository.findByItemId(item1.getItemId());
+        Items result2 = itemsRepository.findByItemId(item2.getItemId());
         // Then
         assertThat(result1)
                 .isNotNull()
                 .extracting("itemId","itemTitle","itemPrice","imgUrl")
-                .containsExactly(1L, "사과", 500L, "www.naver.com");
+                .containsExactly(item1.getItemId(), "사과", 500L, "www.naver.com");
         assertThat(result2)
                 .isNotNull()
                 .extracting("itemId","itemTitle","itemPrice","imgUrl")
-                .containsExactly(2L, "배", 1500L, "naver");
+                .containsExactly(item2.getItemId(), "배", 1500L, "naver");
     }
 
     @DisplayName("가격을 이용해 아이템을 가져올 수 있다")
@@ -115,7 +115,6 @@ class ItemsRepositoryTest {
     }
     public Category createTempCategory(){
         Category category = Category.builder()
-                .categoryId(1L)
                 .categoryTitle("임시카테고리")
                 .build();
         return categoryRepository.save(category);
