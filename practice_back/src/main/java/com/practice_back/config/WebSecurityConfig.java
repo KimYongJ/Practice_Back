@@ -27,8 +27,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
-import javax.persistence.ManyToOne;
-
 /*
  * [ 스프링 시큐리티 흐름 ]
  * 1. 요청 가로채기 : 스프링 시큐리티는 http 요청을 가로채 보안 처리를 수행. 이는 필터 체인을 통해 수행됨.
