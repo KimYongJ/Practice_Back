@@ -6,26 +6,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 class CartItemRepositoryTest {
-    @PersistenceContext
-    EntityManager entityManager;
+
     @Autowired
     MemberRepository memberRepository;
     @Autowired
@@ -37,7 +30,7 @@ class CartItemRepositoryTest {
     @Autowired
     CategoryRepository categoryRepository;
     @AfterEach
-    void tearDwon(){
+    void tearDown(){
         cartItemRepository.deleteAllInBatch();
         cartRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
@@ -91,10 +84,6 @@ class CartItemRepositoryTest {
         int updateCnt1 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(1000L, 5, res_cart.getId(), res_item1.getItemId());
         int updateCnt2 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(2000L, 10, res_cart.getId(), res_item2.getItemId());
 
-        // 위의 jpql사용시 동일 트랜잭션 내에서 같은 엔티티를 여러 번 조회할 때 데이터베이스에서 직접 조회하지 않고 영속성 컨텍스트에서 가져옴
-        // JPQL이나 Native쿼리 사용해 데이터베이스를 직접 변경하면 영속성 컨텍스트가 해당 변경 사항을 인지하지 못함, 하여 아래 2줄 추가
-        entityManager.flush(); // 영속성 컨텍스트의 변경 사항을 데이터베이스에 반영
-        entityManager.clear(); // 영속성 컨텍스트를 비워 이 후 데이터 조회 시 데이터베이스에서 직접 가져오도록함
 
         Optional<Cart> result = cartRepository.findByMemberId(member1.getId());
         // Then

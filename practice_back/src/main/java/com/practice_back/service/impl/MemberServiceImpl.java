@@ -52,11 +52,6 @@ public class MemberServiceImpl implements MemberService {
      * @return ResponseEntity<Object>
      * */
     public ResponseEntity<Object> updateProfile(HttpServletRequest request, UserProfileDTO userProfileDTO){
-        String tmpToken = tokenProvider.getToken(request, "tempToken");
-        if(tmpToken == null){
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                    .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
-        }
         String Id = getCurrentMemberInfo();
         Member member = memberRepository.findById(Id)
                 .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
@@ -72,11 +67,6 @@ public class MemberServiceImpl implements MemberService {
      * @return ResponseEntity<Object>
      * */
     public ResponseEntity<Object> updatePassword(HttpServletRequest request,PasswordDTO passwordDTO){
-        String tmpToken = tokenProvider.getToken(request, "tempToken");
-        if(tmpToken == null){
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                    .body(new Message(ErrorType.MOVED_PERMANENTLY, "Temp 유효시간 만료","checkuser"));
-        }
         String Id = getCurrentMemberInfo();
         Member member = memberRepository.findById(Id)
                 .orElseThrow(()->new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
