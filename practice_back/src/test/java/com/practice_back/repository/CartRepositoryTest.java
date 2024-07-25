@@ -30,7 +30,7 @@ class CartRepositoryTest {
     @Autowired
     CategoryRepository categoryRepository;
     @AfterEach
-    void tearDwon(){
+    void tearDown(){
         cartItemRepository.deleteAllInBatch();
         cartRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();

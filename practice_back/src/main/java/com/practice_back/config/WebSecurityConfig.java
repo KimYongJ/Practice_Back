@@ -6,6 +6,7 @@ import com.practice_back.handler.CustomAuthenticationSuccessHandler;
 import com.practice_back.handler.CustomLogoutHandler;
 import com.practice_back.jwt.AccessTokenFilter;
 import com.practice_back.jwt.CustomLoginFilter;
+import com.practice_back.jwt.TempTokenFilter;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.CartRepository;
 import com.practice_back.repository.MemberRepository;
@@ -126,6 +127,7 @@ public class WebSecurityConfig {
                     .and()
                 .addFilterBefore(new AccessTokenFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class) // 엑세스 토큰 검증 필터 추가
                 .addFilterBefore(customLoginFilter, UsernamePasswordAuthenticationFilter.class) // 로그인 필터
+                .addFilterBefore(new TempTokenFilter(tokenProvider), AccessTokenFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new AuthenticationEntryPointHandler()) // 인증되지 않은 사용자가 보호된 리소스에 접근하려고 할 때 호출(사용자가 로그인하지 않았거나, 인증 토큰이 없는 경우)
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 인증은 되었으나 접근 권한이 없는 리소스에 접근하려 할 때 호출됨.
