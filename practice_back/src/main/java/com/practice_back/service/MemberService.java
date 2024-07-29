@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 public interface MemberService {
-    public ResponseEntity<Object> deleteById(HttpServletRequest request, HttpServletResponse response);
+    public ResponseEntity<Object> deleteById(HttpServletResponse response);
     public ResponseEntity<Object> getUserProfile();
-    public ResponseEntity<Object> updateProfile(HttpServletRequest request,UserProfileDTO userProfileDTO);
-    public ResponseEntity<Object> updatePassword(HttpServletRequest request,PasswordDTO passwordDTO);
+    public ResponseEntity<Object> updateProfile(UserProfileDTO userProfileDTO);
+    public ResponseEntity<Object> updatePassword(PasswordDTO passwordDTO);
 }
