@@ -1,9 +1,7 @@
 package com.practice_back.service.impl;
 
-import com.practice_back.dto.MemberDTO;
 import com.practice_back.dto.PasswordDTO;
 import com.practice_back.dto.UserProfileDTO;
-import com.practice_back.entity.DeliveryAddress;
 import com.practice_back.entity.Member;
 import com.practice_back.jwt.TokenProvider;
 import com.practice_back.repository.MemberRepository;
@@ -11,7 +9,6 @@ import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import com.practice_back.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,8 +17,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 import static com.practice_back.jwt.TokenProvider.contextReset;
 import static com.practice_back.jwt.TokenProvider.getCurrentMemberInfo;
@@ -51,7 +46,7 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return ResponseEntity<Object>
      * */
-    public ResponseEntity<Object> updateProfile(HttpServletRequest request, UserProfileDTO userProfileDTO){
+    public ResponseEntity<Object> updateProfile(UserProfileDTO userProfileDTO){
         String Id = getCurrentMemberInfo();
         Member member = memberRepository.findById(Id)
                 .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
@@ -66,7 +61,7 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return ResponseEntity<Object>
      * */
-    public ResponseEntity<Object> updatePassword(HttpServletRequest request,PasswordDTO passwordDTO){
+    public ResponseEntity<Object> updatePassword(PasswordDTO passwordDTO){
         String Id = getCurrentMemberInfo();
         Member member = memberRepository.findById(Id)
                 .orElseThrow(()->new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
@@ -95,12 +90,11 @@ public class MemberServiceImpl implements MemberService {
      * @return ResponseEntity<Object>
      * */
     @Override
-    public ResponseEntity<Object> deleteById(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<Object> deleteById(HttpServletResponse response){
         String Id = getCurrentMemberInfo();
         int num =  memberRepository.deleteById(Id);
-        boolean bool = num > 0;
 
-        ErrorType error = bool ? ErrorType.ACCOUNT_DELETION_SUCCESS : ErrorType.BAD_REQUEST;
+        ErrorType error = num > 0 ? ErrorType.ACCOUNT_DELETION_SUCCESS : ErrorType.BAD_REQUEST;
 
         tokenProvider.cookieReset(response,"accessToken"); // 쿠키 리셋
         contextReset(); // 인증 리셋

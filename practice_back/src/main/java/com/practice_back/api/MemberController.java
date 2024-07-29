@@ -34,7 +34,7 @@ public class MemberController {
      * */
     @PatchMapping()
     public ResponseEntity<Object> updateProfile(HttpServletRequest request, @Valid @RequestBody UserProfileDTO userProfileDTO){
-        return memberService.updateProfile(request,userProfileDTO);
+        return memberService.updateProfile(userProfileDTO);
     }
 
     /**
@@ -44,7 +44,7 @@ public class MemberController {
      * */
     @PatchMapping("/changpwd")
     public ResponseEntity<Object> updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordDTO passwordDTO){
-        return memberService.updatePassword(request,passwordDTO);
+        return memberService.updatePassword(passwordDTO);
     }
 
     /**
@@ -54,7 +54,7 @@ public class MemberController {
      * */
     @DeleteMapping()
     public ResponseEntity<Object> deleteUser(HttpServletRequest request, HttpServletResponse response){
-        return memberService.deleteById(request, response);
+        return memberService.deleteById(response);
     }
 
 
