@@ -121,7 +121,7 @@ class MemberServiceImplTest {
     @DisplayName("요청만으로 탈퇴할 수 있다.")
     @Test
     @WithMockCustomUser(username="kyj", password="1")
-    void test(){
+    void deleteById(){
         // Given
         HttpServletResponse response = new MockHttpServletResponse();
         Member member = createMember("kyj","1");

@@ -39,9 +39,9 @@ class CartRepositoryTest {
     }
     @DisplayName("사용자 ID를 이용해 카트에 담긴 아이템 숫자를 가져올 수 있다.")
     @Test
-    void test(){
+    void countItemsByMemberId(){
         // Given
-        Category category = createTempCategory();
+        Category category = createTempCategory("카테고리1");
         Items item1 = createItem("사과",500L,"www.naver.com", category);
         Items item2 = createItem("바나나",400L,"www.google.com", category);
         Items item3 = createItem("메론",1400L,"www.kt.com", category);
@@ -108,9 +108,9 @@ class CartRepositoryTest {
                 .category(category)
                 .build();
     }
-    public Category createTempCategory(){
+    public Category createTempCategory(String categoryStr){
         Category category = Category.builder()
-                .categoryTitle("임시카테고리")
+                .categoryTitle(categoryStr)
                 .build();
         return categoryRepository.save(category);
     }
