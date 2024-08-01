@@ -50,12 +50,12 @@ class MemberServiceImplTest {
         memberRepository.save(member);
         // When
         ResponseEntity<Object> result = memberServiceImpl.getUserProfile();
-        Message resultMsg = (Message)result.getBody();
-        UserProfileDTO resultDTO = (UserProfileDTO) resultMsg.getData();
+        Message resultBody = (Message)result.getBody();
+        UserProfileDTO resultDTO = (UserProfileDTO) resultBody.getData();
         // Then
         assertEquals(HttpStatus.OK,result.getStatusCode());
-        assertEquals(ErrorType.OK, resultMsg.getStatus());
-        assertThat(resultMsg.getMessage()).isEqualTo("조회 완료");
+        assertEquals(ErrorType.OK, resultBody.getStatus());
+        assertThat(resultBody.getMessage()).isEqualTo("조회 완료");
         assertThat(resultDTO)
                 .satisfies(dto-> {
                     assertThat(dto.getEmail()).isEqualTo("kyj");

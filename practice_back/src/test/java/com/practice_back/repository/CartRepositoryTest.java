@@ -108,9 +108,9 @@ class CartRepositoryTest {
                 .category(category)
                 .build();
     }
-    public Category createTempCategory(String categoryStr){
+    public Category createTempCategory(String categoryTitle){
         Category category = Category.builder()
-                .categoryTitle(categoryStr)
+                .categoryTitle(categoryTitle)
                 .build();
         return categoryRepository.save(category);
     }
