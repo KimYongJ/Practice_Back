@@ -37,7 +37,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<Object> getCartByEmail(){
-        String Id    = getCurrentMemberInfo();
+        String Id   = getCurrentMemberInfo();
         CartDTO cartDTO = cartRepository.findByMemberId(Id).map(Cart::toDTO)
                              .orElseThrow(()-> new UsernameNotFoundException(Id + " 을 DB에서 찾을 수 없습니다"));
         return ResponseEntity.ok()
@@ -45,8 +45,8 @@ public class CartServiceImpl implements CartService {
     }
     @Override
     public ResponseEntity<Object> countCartItems() {
-        String Id    = getCurrentMemberInfo();
-        long cnt        = cartRepository.countItemsByMemberId(Id);
+        String Id   = getCurrentMemberInfo();
+        long cnt    = cartRepository.countItemsByMemberId(Id);
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"성공", cnt ));
     }

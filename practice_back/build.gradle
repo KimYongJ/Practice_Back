@@ -43,7 +43,8 @@ dependencies {
 
 	// test
 	testImplementation 	'org.springframework.boot:spring-boot-starter-test'				// // JUnit 5 , AssertJ 포함
-	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 	'org.springframework.security:spring-security-test'
+
 }
 
 tasks.named('test') {
