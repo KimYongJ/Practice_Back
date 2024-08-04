@@ -53,7 +53,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public ResponseEntity<Object> insertCartItem(Integer quantity, Long itemId){
         String Id    = getCurrentMemberInfo();
-        Cart cart       = cartRepository.findByMemberId(Id)
+        Cart cart    = cartRepository.findByMemberId(Id)
                             .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
         // 상품이 이미 담겼는지 체크
         boolean bool = cartItemRepository.existsByCartIdAndItemsItemId(cart.getId(), itemId);
@@ -66,7 +66,6 @@ public class CartServiceImpl implements CartService {
 
         Items item = itemsRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("상품 정보가 없습니다."));
-
 
         long totalPrice = quantity * item.getItemPrice(); // 수량과 가격을 곱해 총 금액을 구함
 
