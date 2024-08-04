@@ -8,6 +8,7 @@ import com.practice_back.repository.*;
 import com.practice_back.response.ErrorType;
 import com.practice_back.response.Message;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -41,46 +41,8 @@ class CartServiceImplTest {
     ItemsRepository itemsRepository;
     @Autowired
     CategoryRepository categoryRepository;
-    @AfterEach
-    void tearDwon(){
-        cartItemRepository.deleteAllInBatch();
-        cartRepository.deleteAllInBatch();
-        itemsRepository.deleteAllInBatch();
-        memberRepository.deleteAllInBatch();
-        categoryRepository.deleteAllInBatch();
-    }
-    @DisplayName("인증된 사용자는 카트에 담긴 아이템의 개수를 가져올 수 있다.")
-    @Test
-    @WithMockCustomUser(username="kyj", password = "1")
-    void countCartItems(){
-        // Given
-        Category category = createTempCategory("카테고리1");
-        Items item1 = createItem("사과",500L,"www.naver.com", category);
-        Items item2 = createItem("바나나",400L,"www.google.com", category);
-        Items item3 = createItem("메론",1400L,"www.kt.com", category);
-        itemsRepository.saveAll(List.of(item1, item2, item3));
-        Member member1 = createMember("kyj","1");
-        memberRepository.save(member1);
-        Cart cart = createCart(member1);
-        cart.getCartItems().add(createCartItem(cart, item1));
-        cart.getCartItems().add(createCartItem(cart, item2));
-        cart.getCartItems().add(createCartItem(cart, item3));
-        cartRepository.save(cart);
-        // When
-        ResponseEntity<Object> result = cartServiceImpl.countCartItems();
-        Message resultBody = (Message)result.getBody();
-        long cnt  = (long)resultBody.getData();
-        // Then
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertEquals(resultBody.getMessage(),"성공");
-        assertEquals(resultBody.getStatus(), ErrorType.OK);
-        assertEquals(cnt,3L);
-    }
-    @DisplayName("인증된 사용자는 카트아이템을 가져올 수 있다.")
-    @Test
-    @WithMockCustomUser(username="kyj", password = "1")
-    void getCartByEmail(){
-        // Given
+    @BeforeEach
+    void setUp(){
         Category category = createTempCategory("카테고리1");
         Items item1 = createItem("사과",500L,"www.naver.com", category);
         Items item2 = createItem("바나나",400L,"www.google.com", category);
@@ -95,6 +57,20 @@ class CartServiceImplTest {
         cart.getCartItems().add(createCartItem(cart, item3));
         cart.getCartItems().add(createCartItem(cart, item4));
         cartRepository.save(cart);
+    }
+    @AfterEach
+    void tearDwon(){
+        cartItemRepository.deleteAllInBatch();
+        cartRepository.deleteAllInBatch();
+        itemsRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+        categoryRepository.deleteAllInBatch();
+    }
+    @DisplayName("인증된 사용자는 카트아이템을 가져올 수 있다.")
+    @Test
+    @WithMockCustomUser(username="kyj", password = "1")
+    void getCartByEmail(){
+        // Given
         // When
         ResponseEntity<Object> result = cartServiceImpl.getCartByEmail();
         Message resultBody = (Message)result.getBody();
@@ -113,6 +89,99 @@ class CartServiceImplTest {
                         tuple("메론",1400L,"www.kt.com"),
                         tuple("수박",1500L,"www.lg.com")
                 );
+    }
+    @DisplayName("인증된 사용자는 카트에 담긴 아이템의 개수를 가져올 수 있다.")
+    @Test
+    @WithMockCustomUser(username="kyj", password = "1")
+    void countCartItems(){
+        // Given
+        // When
+        ResponseEntity<Object> result = cartServiceImpl.countCartItems();
+        Message resultBody = (Message)result.getBody();
+        long cnt  = (long)resultBody.getData();
+        // Then
+        assertEquals(result.getStatusCode(), HttpStatus.OK);
+        assertEquals(resultBody.getMessage(),"성공");
+        assertEquals(resultBody.getStatus(), ErrorType.OK);
+        assertEquals(cnt,4L);
+    }
+    @DisplayName("수량과 아이템아이디를 입력하면 상품이 추가 된다.")
+    @Test
+    @WithMockCustomUser(username="kyj", password = "1")
+    void insertCartItem(){
+        // Given
+        int qt = 5;
+        long price = 2500L;
+        Category category = createTempCategory("카테고리1");
+        Items item = createItem("임시아이템",price,"www.google.com", category);
+        itemsRepository.save(item);
+        Long itemId = item.getItemId();
+
+        // When
+        ResponseEntity<Object> result1 = cartServiceImpl.insertCartItem(qt,itemId);
+        Message resMsg1 = (Message)result1.getBody();
+        ResponseEntity<Object> result2 = cartServiceImpl.getCartByEmail();
+        Object data = ((Message)result2.getBody()).getData();
+        List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
+        // Then
+        assertEquals(result1.getStatusCode(),HttpStatus.OK);
+        assertEquals(resMsg1.getStatus(),ErrorType.OK);
+        assertEquals(resMsg1.getMessage(),"카트에 추가하였습니다.");
+        assertThat(items).hasSize(5)
+                .extracting("quantity","totalPrice")
+                .contains(tuple(5,qt*price));
+    }
+    @DisplayName("수량과 아이템아이디를 입력하면 상품 수량과 총 가격을 수정할 수 있다.")
+    @Test
+    @WithMockCustomUser(username="kyj", password = "1")
+    void updateCartItem(){
+        // Given
+        int qt = 5;
+        int transQt = 10;
+        long price = 2500L;
+        Category category = createTempCategory("카테고리1");
+        Items item = createItem("임시아이템",price,"www.google.com", category);
+        itemsRepository.save(item);
+        Long itemId = item.getItemId();
+
+        // When
+        cartServiceImpl.insertCartItem(qt,itemId);
+        ResponseEntity<Object> result1 = cartServiceImpl.updateCartItem(transQt, itemId);
+        Message resMsg1 = (Message)result1.getBody();
+        ResponseEntity<Object> result2 = cartServiceImpl.getCartByEmail();
+        Object data = ((Message)result2.getBody()).getData();
+        List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
+        // Then
+        assertEquals(result1.getStatusCode(),HttpStatus.OK);
+        assertEquals(resMsg1.getStatus(),ErrorType.OK);
+        assertEquals(resMsg1.getMessage(),ErrorType.OK.getErrStr());
+        assertThat(items).hasSize(5)
+                .extracting("quantity","totalPrice")
+                .contains(tuple(transQt,transQt*price));
+    }
+    @DisplayName("아이템 아이디로 카트에 담긴 상품을 삭제할 수 있다.")
+    @Test
+    @WithMockCustomUser(username="kyj", password = "1")
+    void test(){
+        // Given
+        int qt = 10;
+        long price = 2500L;
+        Category category = createTempCategory("카테고리1");
+        Items item = createItem("임시아이템",price,"www.google.com", category);
+        itemsRepository.save(item);
+        Long itemId = item.getItemId();
+        cartServiceImpl.insertCartItem(qt,itemId);
+        // When
+        List<CartItemDTO> origin = ((CartDTO)((Message)cartServiceImpl.getCartByEmail().getBody()).getData()).getCartItemsDTO();
+        cartServiceImpl.deleteCartItem((itemId));
+        List<CartItemDTO> updated = ((CartDTO)((Message)cartServiceImpl.getCartByEmail().getBody()).getData()).getCartItemsDTO();
+        // Then
+        assertThat(origin).hasSize(5)
+                .extracting("quantity","totalPrice")
+                .contains(tuple(qt, qt*price));
+        assertThat(updated).hasSize(4)
+                .extracting("quantity","totalPrice")
+                .doesNotContain(tuple(qt, qt*price));
     }
     public CartItem createCartItem(Cart cart, Items item){
         return CartItem.builder()
