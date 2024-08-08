@@ -81,12 +81,13 @@ class MemberRepositoryTest {
         // Given
         Member member1 = createMember("dummy1@naver.com","123");
         memberRepository.save(member1);
-        // When Then
-        boolean isExist = memberRepository.existsById("dummy1@naver.com");
-        assertThat(isExist).isTrue();
+        // When
+        boolean isExist1 = memberRepository.existsById("dummy1@naver.com");
         int cnt = memberRepository.deleteById("dummy1@naver.com");
-        isExist = memberRepository.existsById("dummy1@naver.com");
-        assertThat(isExist).isFalse();
+        boolean isExist2 = memberRepository.existsById("dummy1@naver.com");
+        // Then
+        assertThat(isExist1).isTrue();
+        assertThat(isExist2).isFalse();
         assertThat(cnt).isEqualTo(1);
     }
     @DisplayName("ID를 통해 사진을 문자열로 가져올 수 있다")

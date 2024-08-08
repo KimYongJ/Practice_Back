@@ -70,40 +70,49 @@ class CartServiceImplTest {
     @Test
     @WithMockCustomUser(username="kyj", password = "1")
     void getCartByEmail(){
-        // Given
-        // When
+        // Given When
         ResponseEntity<Object> result = cartServiceImpl.getCartByEmail();
-        Message resultBody = (Message)result.getBody();
-        CartDTO cartDto = (CartDTO)resultBody.getData();
         // Then
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertEquals(resultBody.getMessage(),"성공");
-        assertEquals(resultBody.getStatus(), ErrorType.OK);
-        assertThat(cartDto.getCartItemsDTO())
-                .hasSize(4)
-                .extracting(CartItemDTO::getItemsDTO)
-                .extracting("itemTitle", "itemPrice", "imgUrl")
-                .containsExactlyInAnyOrder(
-                        tuple("사과",500L,"www.naver.com"),
-                        tuple("바나나",400L,"www.google.com"),
-                        tuple("메론",1400L,"www.kt.com"),
-                        tuple("수박",1500L,"www.lg.com")
-                );
+        assertThat(result).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(), HttpStatus.OK);
+
+                            Message msg = (Message)result.getBody();
+                            assertEquals(msg.getMessage(),"성공");
+                            assertEquals(msg.getStatus(), ErrorType.OK);
+
+                            CartDTO cartDto = (CartDTO)msg.getData();
+                            assertThat(cartDto.getCartItemsDTO())
+                                    .hasSize(4)
+                                    .extracting(CartItemDTO::getItemsDTO)
+                                    .extracting("itemTitle", "itemPrice", "imgUrl")
+                                    .containsExactlyInAnyOrder(
+                                            tuple("사과",500L,"www.naver.com"),
+                                            tuple("바나나",400L,"www.google.com"),
+                                            tuple("메론",1400L,"www.kt.com"),
+                                            tuple("수박",1500L,"www.lg.com")
+                                    );
+                        });
     }
     @DisplayName("인증된 사용자는 카트에 담긴 아이템의 개수를 가져올 수 있다.")
     @Test
     @WithMockCustomUser(username="kyj", password = "1")
     void countCartItems(){
-        // Given
-        // When
+        // Given When
         ResponseEntity<Object> result = cartServiceImpl.countCartItems();
-        Message resultBody = (Message)result.getBody();
-        long cnt  = (long)resultBody.getData();
+
         // Then
-        assertEquals(result.getStatusCode(), HttpStatus.OK);
-        assertEquals(resultBody.getMessage(),"성공");
-        assertEquals(resultBody.getStatus(), ErrorType.OK);
-        assertEquals(cnt,4L);
+        assertThat(result).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(), HttpStatus.OK);
+
+                            Message msg = (Message)result.getBody();
+                            assertEquals(msg.getMessage(),"성공");
+                            assertEquals(msg.getStatus(), ErrorType.OK);
+
+                            long cnt  = (long)msg.getData();
+                            assertEquals(cnt,4L);
+                        });
     }
     @DisplayName("수량과 아이템아이디를 입력하면 상품이 추가 된다.")
     @Test
@@ -116,20 +125,26 @@ class CartServiceImplTest {
         Items item = createItem("임시아이템",price,"www.google.com", category);
         itemsRepository.save(item);
         Long itemId = item.getItemId();
-
         // When
         ResponseEntity<Object> result1 = cartServiceImpl.insertCartItem(qt,itemId);
-        Message resMsg1 = (Message)result1.getBody();
         ResponseEntity<Object> result2 = cartServiceImpl.getCartByEmail();
-        Object data = ((Message)result2.getBody()).getData();
-        List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
         // Then
-        assertEquals(result1.getStatusCode(),HttpStatus.OK);
-        assertEquals(resMsg1.getStatus(),ErrorType.OK);
-        assertEquals(resMsg1.getMessage(),"카트에 추가하였습니다.");
-        assertThat(items).hasSize(5)
-                .extracting("quantity","totalPrice")
-                .contains(tuple(5,qt*price));
+        assertThat(result1).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+
+                            Message msg = (Message)res.getBody();
+                            assertEquals(msg.getStatus(),ErrorType.OK);
+                            assertEquals(msg.getMessage(),"카트에 추가하였습니다.");
+                        });
+        assertThat(result2).isNotNull()
+                        .satisfies(res->{
+                            Object data = ((Message)res.getBody()).getData();
+                            List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
+                            assertThat(items).hasSize(5)
+                                    .extracting("quantity","totalPrice")
+                                    .contains(tuple(5,qt*price));
+                        });
     }
     @DisplayName("수량과 아이템아이디를 입력하면 상품 수량과 총 가격을 수정할 수 있다.")
     @Test
@@ -146,18 +161,27 @@ class CartServiceImplTest {
 
         // When
         cartServiceImpl.insertCartItem(qt,itemId);
+
         ResponseEntity<Object> result1 = cartServiceImpl.updateCartItem(transQt, itemId);
-        Message resMsg1 = (Message)result1.getBody();
         ResponseEntity<Object> result2 = cartServiceImpl.getCartByEmail();
-        Object data = ((Message)result2.getBody()).getData();
-        List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
+
         // Then
-        assertEquals(result1.getStatusCode(),HttpStatus.OK);
-        assertEquals(resMsg1.getStatus(),ErrorType.OK);
-        assertEquals(resMsg1.getMessage(),ErrorType.OK.getErrStr());
-        assertThat(items).hasSize(5)
-                .extracting("quantity","totalPrice")
-                .contains(tuple(transQt,transQt*price));
+        assertThat(result1).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+
+                            Message msg = (Message)res.getBody();
+                            assertEquals(msg.getStatus(),ErrorType.OK);
+                            assertEquals(msg.getMessage(),ErrorType.OK.getErrStr());
+                        });
+        assertThat(result2).isNotNull()
+                        .satisfies(res->{
+                            Object data = ((Message)res.getBody()).getData();
+                            List<CartItemDTO> items = ((CartDTO)data).getCartItemsDTO();
+                            assertThat(items).hasSize(5)
+                                    .extracting("quantity","totalPrice")
+                                    .contains(tuple(transQt,transQt*price));
+                        });
     }
     @DisplayName("아이템 아이디로 카트에 담긴 상품을 삭제할 수 있다.")
     @Test

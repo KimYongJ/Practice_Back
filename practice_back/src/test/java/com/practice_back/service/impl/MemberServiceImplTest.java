@@ -50,17 +50,21 @@ class MemberServiceImplTest {
         memberRepository.save(member);
         // When
         ResponseEntity<Object> result = memberServiceImpl.getUserProfile();
-        Message resultBody = (Message)result.getBody();
-        UserProfileDTO resultDTO = (UserProfileDTO) resultBody.getData();
         // Then
-        assertEquals(HttpStatus.OK,result.getStatusCode());
-        assertEquals(ErrorType.OK, resultBody.getStatus());
-        assertThat(resultBody.getMessage()).isEqualTo("조회 완료");
-        assertThat(resultDTO)
-                .satisfies(dto-> {
-                    assertThat(dto.getEmail()).isEqualTo("kyj");
-                    assertThat(dto.getPhoneNumber()).isEqualTo("123-456-7890");
-                });
+        assertThat(result).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+                            Message msg = (Message)result.getBody();
+                            assertEquals(HttpStatus.OK,result.getStatusCode());
+                            assertEquals(ErrorType.OK, msg.getStatus());
+                            assertThat(msg.getMessage()).isEqualTo("조회 완료");
+                            assertThat((UserProfileDTO) msg.getData())
+                                    .satisfies(dto-> {
+                                        assertThat(dto.getEmail()).isEqualTo("kyj");
+                                        assertThat(dto.getPhoneNumber()).isEqualTo("123-456-7890");
+                                    });
+                        });
+
     }
 
     @DisplayName("휴대폰 번호를 업데이트할 수 있다.")
@@ -74,18 +78,23 @@ class MemberServiceImplTest {
         // When
         Optional<Member> member1 = memberRepository.findById("kyj");
         ResponseEntity<Object> result = memberServiceImpl.updateProfile(userProfileDTO);
-        Message resultBody = (Message)result.getBody();
+
         // Then
-        assertEquals(HttpStatus.OK,result.getStatusCode());
-        assertEquals(ErrorType.OK, resultBody.getStatus());
-        assertThat(resultBody.getMessage()).isEqualTo("변경되었습니다.");
-        assertThat(resultBody.getData()).isEqualTo("010-1234-5678");
         assertThat(member1)
                 .isPresent()
                 .get()
                 .satisfies(mem->{
-                   assertThat(mem.getPhoneNumber()).isEqualTo("010-1234-5678");
+                    assertThat(mem.getPhoneNumber()).isEqualTo("010-1234-5678");
                 });
+
+        assertThat(result).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+                            Message msg = (Message)result.getBody();
+                            assertEquals(ErrorType.OK, msg.getStatus());
+                            assertThat(msg.getMessage()).isEqualTo("변경되었습니다.");
+                            assertThat(msg.getData()).isEqualTo("010-1234-5678");
+                        });
     }
     @DisplayName("비밀번호를 변경할 수 있다")
     @Test
@@ -101,22 +110,31 @@ class MemberServiceImplTest {
         ResponseEntity<Object> result1 = memberServiceImpl.updatePassword(passwordDTO1);
         ResponseEntity<Object> result2 = memberServiceImpl.updatePassword(passwordDTO2);
         ResponseEntity<Object> result3 = memberServiceImpl.updatePassword(passwordDTO3);
-        Message resultBody1 = (Message)result1.getBody();
-        Message resultBody2 = (Message)result2.getBody();
-        Message resultBody3 = (Message)result3.getBody();
         // Then
-        assertEquals(result1.getStatusCode(),HttpStatus.BAD_REQUEST);
-        assertEquals(result2.getStatusCode(),HttpStatus.BAD_REQUEST);
-        assertEquals(result3.getStatusCode(),HttpStatus.OK);
-        assertThat(resultBody1)
-                .extracting("status","message","data")
-                .containsExactly(ErrorType.INVALID_PASSWORD,"유효하지 않은 비밀번호입니다.", null);
-        assertThat(resultBody2)
-                .extracting("status","message","data")
-                .containsExactly(ErrorType.PASSWORD_NO_CHANGE,"기존 비밀번호와 같습니다. 다른 비밀번호를 사용해주세요.", null);
-        assertThat(resultBody3)
-                .extracting("status","message","data")
-                .containsExactly(ErrorType.OK,"변경되었습니다.", null);
+        assertThat(result1).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.BAD_REQUEST);
+                            Message msg = (Message)res.getBody();
+                            assertThat(msg)
+                                    .extracting("status","message","data")
+                                    .containsExactly(ErrorType.INVALID_PASSWORD,"유효하지 않은 비밀번호입니다.", null);
+                        });
+        assertThat(result2).isNotNull()
+                .satisfies(res->{
+                    assertEquals(res.getStatusCode(),HttpStatus.BAD_REQUEST);
+                    Message msg = (Message)res.getBody();
+                    assertThat(msg)
+                            .extracting("status","message","data")
+                            .containsExactly(ErrorType.PASSWORD_NO_CHANGE,"기존 비밀번호와 같습니다. 다른 비밀번호를 사용해주세요.", null);
+                });
+        assertThat(result3).isNotNull()
+                .satisfies(res->{
+                    assertEquals(res.getStatusCode(),HttpStatus.OK);
+                    Message msg = (Message)res.getBody();
+                    assertThat(msg)
+                            .extracting("status","message","data")
+                            .containsExactly(ErrorType.OK,"변경되었습니다.", null);
+                });
     }
     @DisplayName("요청만으로 탈퇴할 수 있다.")
     @Test
@@ -129,17 +147,23 @@ class MemberServiceImplTest {
         // When
         ResponseEntity<Object> result1 = memberServiceImpl.deleteById(response);
         ResponseEntity<Object> result2 = memberServiceImpl.deleteById(response);
-        Message resultBody1 = (Message)result1.getBody();
-        Message resultBody2 = (Message)result2.getBody();
         // Then
-        assertEquals(result1.getStatusCode(),HttpStatus.OK);
-        assertEquals(result2.getStatusCode(),HttpStatus.OK);
-        assertThat(resultBody1)
-                .extracting("status","message","data")
-                .containsExactly(ErrorType.ACCOUNT_DELETION_SUCCESS,ErrorType.ACCOUNT_DELETION_SUCCESS.getErrStr(),1);
-        assertThat(resultBody2)
-                .extracting("status","message","data")
-                .containsExactly(ErrorType.BAD_REQUEST,ErrorType.BAD_REQUEST.getErrStr(),0);
+        assertThat(result1).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+                            Message msg = (Message)res.getBody();
+                            assertThat(msg)
+                                    .extracting("status","message","data")
+                                    .containsExactly(ErrorType.ACCOUNT_DELETION_SUCCESS,ErrorType.ACCOUNT_DELETION_SUCCESS.getErrStr(),1);
+                        });
+        assertThat(result2).isNotNull()
+                        .satisfies(res->{
+                            assertEquals(res.getStatusCode(),HttpStatus.OK);
+                            Message msg = (Message)res.getBody();
+                            assertThat(msg)
+                                    .extracting("status","message","data")
+                                    .containsExactly(ErrorType.BAD_REQUEST,ErrorType.BAD_REQUEST.getErrStr(),0);
+                        });
     }
     public PasswordDTO createPasswordDTO(String newPassword,String newPasswordConfirm){
         return PasswordDTO.builder()

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import static com.practice_back.jwt.TokenProvider.getCurrentMemberInfo;
@@ -38,7 +39,7 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     public ResponseEntity<Object> insertDeliveryInfo(DeliveryAddressDTO deliveryAddressDTO) {
         String ID = getCurrentMemberInfo();
         Member member = memberRepo.findById(ID)
-                .orElseThrow(()-> new UsernameNotFoundException(ID + " 을 DB에서 찾을 수 없습니다"));;
+                .orElseThrow(()-> new UsernameNotFoundException(ID + " 을 DB에서 찾을 수 없습니다"));
 
         int size = member.getDeliveryAddresses().size();
 
@@ -67,11 +68,15 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     @Override
     public ResponseEntity<Object> patchDeliveryInfo(DeliveryAddressDTO deliveryAddressDTO) {
         String Id = getCurrentMemberInfo();
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressId(deliveryAddressDTO.getDeliveryAddressId())
-                .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressDTO.getDeliveryAddressId()));
+        List<DeliveryAddress> addresses = delRepo.findByMemberId(Id);
+
+        // 전달된 정보에 대해 기본 배송지 설정
+        DeliveryAddress deliveryAddress = addresses.stream()
+                .filter(address -> address.getDeliveryAddressId().equals(deliveryAddressDTO.getDeliveryAddressId()))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("배송지를 찾을 수 없습니다."));
 
         deliveryAddress.update(deliveryAddressDTO);
-        delRepo.save(deliveryAddress);
 
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"수정되었습니다.", deliveryAddressDTO ));
@@ -102,14 +107,18 @@ public class DeliveryAddressServiceImpl implements DeliveryAddressService {
     @Override
     public ResponseEntity<Object> deleteDeliveryInfo(Long deliveryAddressId) {
         String Id = getCurrentMemberInfo();
-        // ID로 배송지 정보 찾기
-        DeliveryAddress deliveryAddress = delRepo.findByDeliveryAddressId(deliveryAddressId)
-                .orElseThrow(() -> new RuntimeException("잘못된 정보 입니다 : " + deliveryAddressId));
 
-        // 배송지 정보 삭제
-        delRepo.delete(deliveryAddress);
+        List<DeliveryAddress> addresses = delRepo.findByMemberId(Id);
 
-        // 성공 응답 반환
+        Iterator<DeliveryAddress> ite = addresses.iterator();
+        while(ite.hasNext()){
+            DeliveryAddress ds = ite.next();
+            if(deliveryAddressId == ds.getDeliveryAddressId()){
+                delRepo.delete(ds);
+                break;
+            }
+        }
+
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.OK,"삭제되었습니다.", null ));
     }
