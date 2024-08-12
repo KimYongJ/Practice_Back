@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -41,7 +42,14 @@ public class ItemsServiceImpl implements ItemsService {
 
     @Override
     public ResponseEntity<Object> getItemsByItemId(Long itemId){
-        ItemsDTO itemDTO = Items.toDTO(itemsRepository.findByItemId(itemId));
+        ItemsDTO itemDTO = null;
+
+        Items item = itemsRepository.findByItemId(itemId);
+
+        if(item!= null && item.getItemId() > 0) {
+            itemDTO = Items.toDTO(item);
+        }
+
         return ResponseEntity.ok(itemDTO);
     }
 
@@ -73,13 +81,13 @@ public class ItemsServiceImpl implements ItemsService {
             MultipartFile file,
             String title,
             String price,
-            String itemid,
-            String imgurl
+            String itemId,
+            String imgUrl
     )throws IOException{
-        ItemsDTO itemsDTO = Items.toDTO(itemsRepository.getById(Long.parseLong(itemid)));
-        String newImageUrl = imgurl;
+        ItemsDTO itemsDTO = Items.toDTO(itemsRepository.getById(Long.parseLong(itemId)));
+        String newImageUrl = imgUrl;
         if(file != null && !file.isEmpty()) {
-            newImageUrl = imageServiceImple.updaetImageOnS3(imgurl, file);
+            newImageUrl = imageServiceImple.updaetImageOnS3(imgUrl, file);
         }
         itemsDTO.setItemTitle(title);
         itemsDTO.setItemPrice(Long.parseLong(price));
@@ -87,15 +95,23 @@ public class ItemsServiceImpl implements ItemsService {
         itemsDTO = Items.toDTO(itemsRepository.save(ItemsDTO.toEntity(itemsDTO)));
 
         return ResponseEntity.ok()
-                .body(new Message(ErrorType.OK,"저장했습니다.", itemsDTO ));
+                .body(new Message(ErrorType.OK,"수정했습니다.", itemsDTO ));
     }
 
     @Override
     public ResponseEntity<Object> deleteItem(Long itemId){
-        String imageUrl = itemsRepository.getById(itemId).getImgUrl();
-        imageServiceImple.deleteImageFromS3(imageUrl);
-        itemsRepository.deleteById(itemId);
-        return ResponseEntity.ok()
-                .body(new Message(ErrorType.OK, "삭제했습니다.", 1));
+        Items items = itemsRepository.findByItemId(itemId);
+        if(items != null && items.getItemId() > 0 ){
+            String imageUrl = items.getImgUrl();
+            imageServiceImple.deleteImageFromS3(imageUrl);
+            itemsRepository.deleteById(itemId);
+            return ResponseEntity.ok()
+                    .body(new Message(ErrorType.OK, "삭제했습니다.", 1));
+        }
+        else
+        {
+            return ResponseEntity.ok()
+                    .body(new Message(ErrorType.OK, "삭제할 데이터가 없습니다.", 0));
+        }
     }
 }
