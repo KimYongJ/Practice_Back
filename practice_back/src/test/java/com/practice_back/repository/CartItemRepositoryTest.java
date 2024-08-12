@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,8 +46,7 @@ class CartItemRepositoryTest {
         Items item1 = createItem("사과",500L,"www.naver.com", category);
         Items item2 = createItem("바나나",400L,"www.google.com", category);
         Items item3 = createItem("수박",300L,"www.nate.com", category);
-        Items res_item1 = itemsRepository.save(item1);
-        Items res_item2 = itemsRepository.save(item2);
+        itemsRepository.saveAll(List.of(item1,item2));
         Member member1 = createMember("dummy@gamil.com","123");
         memberRepository.save(member1);
         Cart cart = createCart(member1);
@@ -54,11 +54,10 @@ class CartItemRepositoryTest {
         cart.getCartItems().add(createCartItem(cart, item2, 2, 200L));
         Cart res_cart = cartRepository.save(cart);
         // When
-        boolean result1 = cartItemRepository.existsByCartIdAndItemsItemId(res_cart.getId(), res_item1.getItemId());
-        boolean result2 = cartItemRepository.existsByCartIdAndItemsItemId(res_cart.getId(), res_item2.getItemId());
+        boolean result1 = cartItemRepository.existsByCartIdAndItemsItemId(res_cart.getId(), item1.getItemId());
+        boolean result2 = cartItemRepository.existsByCartIdAndItemsItemId(res_cart.getId(), item2.getItemId());
         boolean result3 = cartItemRepository.existsByCartIdAndItemsItemId(res_cart.getId(), item3.getItemId());
         // Then
-        assertThat(res_item1 == item1).isTrue(); // 저장시 입력한 객체와 출력된 객체가 동일 주소값을 참조함을 증명
         assertThat(result1).isTrue();
         assertThat(result2).isTrue();
         assertThat(result3).isFalse();
@@ -70,8 +69,7 @@ class CartItemRepositoryTest {
         Category category = createTempCategory();
         Items item1 = createItem("사과",500L,"www.naver.com", category);
         Items item2 = createItem("바나나",400L,"www.google.com", category);
-        Items res_item1 = itemsRepository.save(item1);
-        Items res_item2 = itemsRepository.save(item2);
+        itemsRepository.saveAll(List.of(item1,item2));
 
         Member member1 = createMember("dummy@gamil.com","123");
         memberRepository.save(member1);
@@ -81,9 +79,8 @@ class CartItemRepositoryTest {
         Cart res_cart = cartRepository.save(cart);
 
         // When
-        int updateCnt1 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(1000L, 5, res_cart.getId(), res_item1.getItemId());
-        int updateCnt2 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(2000L, 10, res_cart.getId(), res_item2.getItemId());
-
+        int updateCnt1 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(1000L, 5, res_cart.getId(), item1.getItemId());
+        int updateCnt2 = cartItemRepository.updateTotalPriceQuantityByCartIdAndItemId(2000L, 10, res_cart.getId(), item2.getItemId());
 
         Optional<Cart> result = cartRepository.findByMemberId(member1.getId());
         // Then

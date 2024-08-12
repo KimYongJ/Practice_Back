@@ -186,7 +186,7 @@ class CartServiceImplTest {
     @DisplayName("아이템 아이디로 카트에 담긴 상품을 삭제할 수 있다.")
     @Test
     @WithMockCustomUser(username="kyj", password = "1")
-    void test(){
+    void deleteCartItem(){
         // Given
         int qt = 10;
         long price = 2500L;

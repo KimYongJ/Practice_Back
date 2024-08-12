@@ -35,7 +35,9 @@ public class ImageServiceImpl {
     }
     public String updaetImageOnS3(String before, MultipartFile file) throws IOException{
         String imageUrl = uploadImageToS3(file);
-        deleteImageFromS3(before);
+        if(before != null) {
+            deleteImageFromS3(before);
+        }
         return imageUrl;
     }
     public void deleteImageFromS3(String imageUrl){
