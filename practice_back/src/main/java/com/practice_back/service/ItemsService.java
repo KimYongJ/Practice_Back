@@ -1,6 +1,5 @@
 package com.practice_back.service;
 
-import com.practice_back.dto.ItemsDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
