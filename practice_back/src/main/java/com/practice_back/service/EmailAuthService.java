@@ -2,8 +2,6 @@ package com.practice_back.service;
 
 import org.springframework.http.ResponseEntity;
 
-import java.util.Random;
-
 public interface EmailAuthService {
     public ResponseEntity<Object> sendNewPassword(String email);
     public String generateRandomPassword();
