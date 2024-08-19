@@ -18,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -61,7 +63,7 @@ public class ItemsServiceImpl implements ItemsService {
         Category category = categoryService.findById(Long.parseLong(categoryId))
                 .orElseThrow(()->new EntityNotFoundException("없는 카테고리 입니다."));
 
-        String imageUrl = imageServiceImple.uploadImageToS3(file);
+        String imageUrl = imageServiceImple.uploadImage(file, UUID.randomUUID().toString(), LocalDateTime.now());
 
         Items items = Items.builder()
                 .itemTitle(title)
@@ -85,7 +87,7 @@ public class ItemsServiceImpl implements ItemsService {
         ItemsDTO itemsDTO = Items.toDTO(itemsRepository.getById(Long.parseLong(itemId)));
         String newImageUrl = imgUrl;
         if(file != null && !file.isEmpty()) {
-            newImageUrl = imageServiceImple.updaetImageOnS3(imgUrl, file);
+            newImageUrl = imageServiceImple.updateImage(imgUrl, file, UUID.randomUUID().toString(),LocalDateTime.now());
         }
         itemsDTO.setItemTitle(title);
         itemsDTO.setItemPrice(Long.parseLong(price));
@@ -101,7 +103,7 @@ public class ItemsServiceImpl implements ItemsService {
         Items items = itemsRepository.findByItemId(itemId);
         if(items != null && items.getItemId() > 0 ){
             String imageUrl = items.getImgUrl();
-            imageServiceImple.deleteImageFromS3(imageUrl);
+            imageServiceImple.deleteImage(imageUrl);
             itemsRepository.deleteById(itemId);
             return ResponseEntity.ok()
                     .body(new Message(ErrorType.OK, "삭제했습니다.", 1));
