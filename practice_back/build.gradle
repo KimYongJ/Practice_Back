@@ -33,6 +33,9 @@ dependencies {
 	implementation 		'org.apache.commons:commons-imaging:1.0-alpha2'
 	developmentOnly 	'org.springframework.boot:spring-boot-devtools'
 
+	// File
+	implementation 'commons-io:commons-io:2.11.0'
+	
 	// DB
 	implementation 		'mysql:mysql-connector-java' 									// MySql
 	runtimeOnly			'com.h2database:h2'
@@ -44,7 +47,6 @@ dependencies {
 	// test
 	testImplementation 	'org.springframework.boot:spring-boot-starter-test'				// // JUnit 5 , AssertJ 포함
 	testImplementation 	'org.springframework.security:spring-security-test'
-
 }
 
 tasks.named('test') {

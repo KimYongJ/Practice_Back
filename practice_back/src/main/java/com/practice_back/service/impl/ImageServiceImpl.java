@@ -25,10 +25,10 @@ public class ImageServiceImpl {
 
     private final S3StorageServiceImpl s3StorageServiceImpl;
 
-    public String uploadImageToS3(MultipartFile file)  throws IOException {
+    public String uploadImage(MultipartFile file,String uid, LocalDateTime now)  throws IOException {
         File fileObj = convertMultiPartFileToFile(file);
 
-        String fileName = generateFileName(LocalDateTime.now());
+        String fileName = generateFileName(uid,now);
 
         String url = s3StorageServiceImpl.uploadFile(fileObj,fileName);
 
@@ -36,20 +36,20 @@ public class ImageServiceImpl {
 
         return url;
     }
-    public String updaetImageOnS3(String before, MultipartFile file) throws IOException{
-        String imageUrl = uploadImageToS3(file);
-        if(before != null) {
-            deleteImageFromS3(before);
+    public String updateImage(String beforeImgUrl, MultipartFile file,String uid, LocalDateTime now) throws IOException{
+        String imageUrl = uploadImage(file,uid, now);
+        if(beforeImgUrl != null) {
+            deleteImage(beforeImgUrl);
         }
         return imageUrl;
     }
-    public void deleteImageFromS3(String imageUrl){
+    public void deleteImage(String imageUrl){
 
         String key = imageUrl.substring(imageUrl.lastIndexOf("/")+1);
 
         s3StorageServiceImpl.deleteFile(key);
     }
-    private File convertMultiPartFileToFile(MultipartFile file) throws IOException {
+    public File convertMultiPartFileToFile(MultipartFile file) throws IOException {
         if( !isValidImageFile(file) ){
             throw new InvalidImageFileException("유효하지 않은 이미지 형식입니다.");
         }
@@ -59,10 +59,10 @@ public class ImageServiceImpl {
         }
         return convertedFile;
     }
-    private String generateFileName(LocalDateTime now) {
+    public String generateFileName(String UUID, LocalDateTime now) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
         String timestamp = now.format(formatter);
-        return UUID.randomUUID().toString() + "_" + timestamp;
+        return UUID + "_" + timestamp;
     }
     public boolean isValidImageFile(MultipartFile file) {
         final long MAX_SIZE = 5 * 1024 * 1024; // 5MB
