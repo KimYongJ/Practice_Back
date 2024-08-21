@@ -4,7 +4,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface EmailAuthService {
     public ResponseEntity<Object> sendNewPassword(String email);
-    public String generateRandomPassword();
-    public String buildEmailContent(String password) ;
-    public ResponseEntity<Object> sendEmail(String email, String subject, String content, String newPassword);
+
 }
