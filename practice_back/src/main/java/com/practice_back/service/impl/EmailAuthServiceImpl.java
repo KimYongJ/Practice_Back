@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +53,7 @@ public class EmailAuthServiceImpl implements EmailAuthService {
      * 임시 비밀번호를 생성합니다.
      * @return 생성된 임시 비밀번호 문자열
      */
-    @Override
-    public String generateRandomPassword() {
+    private String generateRandomPassword() {
         StringBuffer newPassword = new StringBuffer();
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
@@ -78,8 +76,7 @@ public class EmailAuthServiceImpl implements EmailAuthService {
      * @param password 발급된 임시 비밀번호
      * @return 메일 본문
      */
-    @Override
-    public String buildEmailContent(String password) {
+    private String buildEmailContent(String password) {
         return String.format(
                 "<div style='font-family: Arial, sans-serif; text-align: center; color: #333;  padding: 40px;'>" +
                         "<h1>임시 비밀번호 안내</h1>" +
@@ -100,30 +97,29 @@ public class EmailAuthServiceImpl implements EmailAuthService {
      * @param subject 메일 제목
      * @param content 메일 내용
      */
-    @Override
-    public ResponseEntity<Object> sendEmail(String email, String subject, String content, String newPassword) {
+    private ResponseEntity<Object> sendEmail(String Id, String subject, String content, String newPassword) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(email);                  // 보내는사람 생략하면 정상작동을 하지 않는 경우가 있음 아무 메일을 적어도 구글 계정으로 발신자 셋팅
-            helper.setTo(email);                    // 받는사람 이메일
+            helper.setFrom(Id);                  // 보내는사람 생략하면 정상작동을 하지 않는 경우가 있음 아무 메일을 적어도 구글 계정으로 발신자 셋팅
+            helper.setTo(Id);                    // 받는사람 이메일
             helper.setSubject(subject);             // 메일제목은 생략이 가능
             helper.setText(content, true);     // 파라미터순서 : (1)이메일 본문의 내용을 나타내는 문자열 , (2) boolean 타입으로 html 형식 인지 아닌지
 
             mailSender.send(message);
 
             // email로 맴버를 찾음 -> entity비번 변경 -> save
-            Member member = memberRepository.findById(email)
+            Member member = memberRepository.findById(Id)
                     .orElseThrow(() -> new EntityNotFoundException("사용자 정보가 잘못되었습니다."));
             member.changePassword( passwordEncoder.encode(newPassword) );
             memberRepository.save(member);
             return ResponseEntity.ok()
-                    .body(new Message(ErrorType.OK, "이메일을 확인하세요!", email));
+                    .body(new Message(ErrorType.OK, "이메일을 확인하세요!", null));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest()
-                    .body(new Message(ErrorType.INTERNAL_SERER_ERROR, "발송 실패", email));
+                    .body(new Message(ErrorType.INTERNAL_SERER_ERROR, "발송 실패", Id));
         }
     }
 }
