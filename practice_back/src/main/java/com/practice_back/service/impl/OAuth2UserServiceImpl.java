@@ -31,13 +31,13 @@ import java.util.UUID;
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ /** 주석 2*/
     private final PasswordEncoder   passwordEncoder;
     private final MemberRepository  memberRepository;
-    private final FactoryUserInfo factoryUserInfo;
+    private final FactoryUserInfo   factoryUserInfo;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User           = super.loadUser(userRequest);
-        Oauth2UserInfo oauth2UserInfo   = factoryUserInfo.makeOauth2Userinfo(userRequest.getClientRegistration().getRegistrationId(),oAuth2User);
-        String userNameAttributeName    = userRequest.getClientRegistration().getProviderDetails()
-                                            .getUserInfoEndpoint().getUserNameAttributeName();
+        OAuth2User oAuth2User           = loadUserFromSuper(userRequest);
+        String provider                 = getProvider(userRequest);
+        Oauth2UserInfo oauth2UserInfo   = makeOauth2UserInfo(provider, oAuth2User);
+        String userNameAttributeName    = extractUserNameAttributeName(userRequest);
 
         insertMember(oauth2UserInfo);
 
@@ -47,8 +47,20 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService{ /** 주석 
                 oauth2UserInfo.getAttributes(),
                 userNameAttributeName);
     }
-
-    public void insertMember(Oauth2UserInfo oauth2UserInfo){
+    protected Oauth2UserInfo makeOauth2UserInfo(String provider, OAuth2User oAuth2User) {
+        return factoryUserInfo.makeOauth2Userinfo(provider, oAuth2User);
+    }
+    protected String getProvider(OAuth2UserRequest userRequest) {
+        return userRequest.getClientRegistration().getRegistrationId();
+    }
+    protected OAuth2User loadUserFromSuper(OAuth2UserRequest userRequest) {
+        return super.loadUser(userRequest);
+    }
+    protected String extractUserNameAttributeName(OAuth2UserRequest userRequest) {
+        return userRequest.getClientRegistration().getProviderDetails()
+                .getUserInfoEndpoint().getUserNameAttributeName();
+    }
+    private void insertMember(Oauth2UserInfo oauth2UserInfo){
         String email    = oauth2UserInfo.getEmail();
         String picture  = oauth2UserInfo.getPicture();
         String Id       = oauth2UserInfo.getProviderId().concat( oauth2UserInfo.getProvider() );
