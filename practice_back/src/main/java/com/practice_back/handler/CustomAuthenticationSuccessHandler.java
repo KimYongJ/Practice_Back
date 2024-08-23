@@ -2,7 +2,7 @@ package com.practice_back.handler;
 
 import com.practice_back.entity.Oauth2.Oauth2UserInfo;
 import com.practice_back.jwt.TokenProvider;
-import com.practice_back.service.impl.FactoryUserInfo;
+import com.practice_back.factory.FactoryUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;

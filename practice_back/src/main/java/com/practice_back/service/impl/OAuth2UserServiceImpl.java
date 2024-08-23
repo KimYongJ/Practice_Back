@@ -6,7 +6,7 @@ import com.practice_back.entity.Cart;
 import com.practice_back.entity.Member;
 import com.practice_back.entity.Oauth2.Oauth2UserInfo;
 import com.practice_back.repository.MemberRepository;
-import com.practice_back.service.impl.FactoryUserInfo;
+import com.practice_back.factory.FactoryUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
