@@ -1,4 +1,9 @@
-package com.practice_back.service.impl;
+package com.practice_back.factory;
+
+import com.practice_back.entity.Oauth2.*;
+import com.practice_back.response.ProviderType;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -6,12 +11,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.practice_back.entity.Oauth2.*;
-import com.practice_back.response.ProviderType;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Component;
 /**
  * 로그인 루트에 따른 UserInfo 생성 클래스,
  * 팩토리 메소드 패턴으로 하위 타입으로 변환( ex) Oauth2UserInfo -> NaverUserInfo )
