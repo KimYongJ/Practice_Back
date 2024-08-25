@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
         // 정보가 맞는지 확인
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
         try{
-            authenticationManager.authenticate(authRequest);    // 없는 정보라면 exception 발생
+            validate(authRequest);    // 없는 정보라면 exception 발생
 
             String tempToken = tokenProvider.createTempToken(loginDTO.getEmail());
             tokenProvider.saveCookie(response,"tempToken",tempToken, 2); // 응답에 토큰을 저장한다.
@@ -64,12 +64,6 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .body(new Message(ErrorType.MOVED_PERMANENTLY, "확인 완료.","account"));
     }
-    @Override
-    public boolean existsByEmail(String Id)
-    {
-        return memberRepository.existsById(Id);
-    }
-
     @Override
     public ResponseEntity<Object> validateTmpToken(HttpServletRequest request){
         ErrorType errorType;
@@ -85,11 +79,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<Member> findById(String Id){
-        return memberRepository.findById(Id);
-    }
-
-    @Override
     public ResponseEntity<Object> verifyRecaptcha(Map<String, Object> recaptchaData){
         String token                        = (String) recaptchaData.get("token");
         HttpHeaders httpHeaders             = new HttpHeaders();
@@ -101,10 +90,27 @@ public class AuthServiceImpl implements AuthService {
         map.add("response", token);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, httpHeaders);
 
-        Map<String,Object> response = restTemplate.postForObject(recaptchaServerURL, request, Map.class); // 해당 url로 token과 secret key를 전송. 유효성 검증.
+        Map<String,Object> response = postForObject(request, restTemplate); // 해당 url로 token과 secret key를 전송. 유효성 검증.
+
         boolean bool = (boolean)response.get("success");
 
         return ResponseEntity.ok()
                 .body(new Message(ErrorType.AUTHENTICATION_SUCCESS,"수신 완료", bool));
+    }
+    @Override
+    public boolean existsByEmail(String email)
+    {
+        return memberRepository.existsByEmail(email);
+    }
+    @Override
+    public Optional<Member> findById(String Id){
+        return memberRepository.findById(Id);
+    }
+
+    protected void validate(UsernamePasswordAuthenticationToken authRequest) throws Exception{
+        authenticationManager.authenticate(authRequest);    // 없는 정보라면 exception 발생
+    }
+    protected Map<String,Object> postForObject(HttpEntity<MultiValueMap<String, String>> request, RestTemplate restTemplate){
+        return restTemplate.postForObject(recaptchaServerURL, request, Map.class); // 해당 url로 token과 secret key를 전송. 유효성 검증.
     }
 }

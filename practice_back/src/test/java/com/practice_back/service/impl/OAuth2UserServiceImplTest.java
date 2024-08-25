@@ -1,16 +1,15 @@
 package com.practice_back.service.impl;
-import com.practice_back.factory.FactoryUserInfo;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.practice_back.entity.Member;
+import com.practice_back.factory.FactoryUserInfo;
 import com.practice_back.mockClass.MockOauth2UserInfo;
 import com.practice_back.repository.MemberRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,14 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
 class OAuth2UserServiceImplTest {
-
     @SpyBean
     private OAuth2UserServiceImpl oauth2UserService;
     @Autowired
