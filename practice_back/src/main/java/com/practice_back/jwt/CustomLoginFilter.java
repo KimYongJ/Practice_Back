@@ -13,7 +13,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,9 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import static com.practice_back.handler.HandlerFunc.handlerException;
-
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider     tokenProvider;
@@ -39,8 +36,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         this.memberRepository = memberRepository;
         super.setFilterProcessesUrl("/api/auth/login"); // 로그인시 전달될 커스텀 api를 정의 한다.
     }
-
-
     /**
     * [ attemptAuthentication 함수 ]
     * - 사용자가 POST 요청으로 로그인 정보를 전송할 때 이 메소드가 호출 된다.
@@ -68,7 +63,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         * */
         return authenticationManager.authenticate(authRequest);// 로그인 유저의 검증은 AuthenticationManager가 처리한다.
     }
-
     /**
     * 로그인 성공시 호출되는 함수
     * */
@@ -90,6 +84,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         long cntCartItems       = cartRepository.countItemsByMemberId(Id);
         boolean master          = authorities.contains("ROLE_ADMIN");
         LoginDTO loginDTO       = LoginDTO.builder()
+                                    .email(Id)
                                     .cntCartItems(cntCartItems)
                                     .master(master)
                                     .picture(picture)
@@ -104,8 +99,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
         handlerException(response, ErrorType.LOGIN_FAILED);
     }
-
-    public Map<String, Object> getBody(HttpServletRequest request) throws IOException {
+    protected Map<String, Object> getBody(HttpServletRequest request) throws IOException {
         StringBuffer sb = new StringBuffer();
         BufferedReader bufferedReader = null;
         try {
