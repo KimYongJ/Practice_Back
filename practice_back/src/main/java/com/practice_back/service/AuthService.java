@@ -15,7 +15,6 @@ public interface AuthService {
     public boolean existsByEmail(String email);
     public ResponseEntity<Object> gettemptoken(HttpServletResponse response, LoginDTO loginDTO);
     public ResponseEntity<Object> validateTmpToken(HttpServletRequest request);
-
     public Optional<Member> findById(String Id);
     public ResponseEntity<Object> verifyRecaptcha(Map<String, Object> recaptchaData);
 }

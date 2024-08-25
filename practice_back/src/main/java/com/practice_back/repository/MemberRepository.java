@@ -21,6 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findAllByEmailIn(List<String> email);
     boolean existsById(String Id);
+    boolean existsByEmail(String email);
     Member save(Member member);
     int deleteById(String Id);
     @Query("SELECT m.picture from Member m WHERE m.id =:id")

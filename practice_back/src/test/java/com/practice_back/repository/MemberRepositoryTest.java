@@ -9,21 +9,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.AssertTrue;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @ActiveProfiles("test")
 @SpringBootTest()
 @Transactional
 class MemberRepositoryTest {
-
     @Autowired
     MemberRepository memberRepository;
-
     @AfterEach
     void tearDown(){
         memberRepository.deleteAllInBatch();
@@ -52,18 +53,34 @@ class MemberRepositoryTest {
     @Test
     void findById(){
         // Given
-        Member member1 = createMember("dummy1@naver.com","123");
+        String email = "dummy1@naver.com";
+        String password = "123";
+        Member member1 = createMember(email,password);
         memberRepository.save(member1);
         // When
-        Optional<Member> member = memberRepository.findById("dummy1@naver.com");
+        Optional<Member> member = memberRepository.findById(email);
         // Then
         assertThat(member)
                 .isPresent() // optional이 비어있지 않은지 확인
                 .get()// Optional에서 실제 member 객체 추출
                 .extracting("email","password")
-                .containsExactly("dummy1@naver.com","123");
+                .containsExactly(email, password);
     }
-
+    @DisplayName("Email를 통해 멤버를 가져올 수 있다")
+    @Test
+    void findByEmail(){
+        // Given
+        String email = "dummy1@naver.com";
+        String password = "123";
+        Member member1 = createMember(email,password);
+        memberRepository.save(member1);
+        // When
+        boolean bool1 = memberRepository.existsByEmail(email);
+        boolean bool2 = memberRepository.existsByEmail("-");
+        // Then
+        assertTrue(bool1);
+        assertFalse(bool2);
+    }
     @DisplayName("멤버 아이디 존재 유무를 확인할 수 있다")
     @Test
     void existsById(){

@@ -103,7 +103,7 @@ public class TokenProvider {
         if(flag == 2){
             MAX_AGE = TEMP_TOKEN_EXPIRE_TIME;
         }
-        ResponseCookie cookie =ResponseCookie.from(cookieName, token)
+        ResponseCookie cookie = ResponseCookie.from(cookieName, token)
                 .domain("localhost")
                 .sameSite("Lax") // Lax, None, Strict
        //         .secure(true)//메서드를 호출하여 쿠키가 HTTPS를 통해서만 전송되도록 함. 개발환경에서는 비활성화, 비활성화 하면서 httpOnly가 true이면 sameSite는 None으로할 수 없다.
