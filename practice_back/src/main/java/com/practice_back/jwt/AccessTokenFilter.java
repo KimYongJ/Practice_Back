@@ -51,7 +51,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
                          *   setAuthentication를 사용해 Authentication을 설정하지 않으면, 현재 사용자 인증 정보가 조회되지 않아 결과적으로 보안을 적용할 수 없다.
                          * - setAuthentication를 사용해 설정된 인증 정보는 SecurityContextHolder를 통해 컨트롤러에서 Authentication 객체를 통해 접근할 수 있다.
                          * - 접근예시 : Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                         *			  String userId = authentication.getName();
+                      k   *			  String userId = authentication.getName();
                          * */
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
