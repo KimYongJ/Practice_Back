@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         Member member = memberDTO.toMemberSignUp(Authority.ROLE_USER, passwordEncoder);  // password는 암호화 한 상태로 저장한다.
         member.getCart().setMember(member);
         memberRepository.save( member );
-        String accessToken = tokenProvider.createAccessToken(member.getEmail(), Authority.ROLE_USER.name()); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        String accessToken = tokenProvider.createAccessToken(member.getEmail(), Authority.ROLE_USER.name(), new Date()); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장한다.
         return member.of(member);
     }
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         try{
             validate(authRequest);    // 없는 정보라면 exception 발생
 
-            String tempToken = tokenProvider.createTempToken(loginDTO.getEmail());
+            String tempToken = tokenProvider.createTempToken(loginDTO.getEmail(), Authority.ROLE_USER.name(), new Date());
             tokenProvider.saveCookie(response,"tempToken",tempToken, 2); // 응답에 토큰을 저장한다.
         }catch(Exception e){
             return ResponseEntity.badRequest()

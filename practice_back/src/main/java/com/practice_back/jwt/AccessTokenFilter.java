@@ -42,7 +42,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             try {
                 if (tokenProvider.validateToken(response, accessToken))// 토큰의 유효성을 검증한다.
                 {
-                    Authentication authentication = tokenProvider.getAuthentication(request, accessToken); // 사용자 인증 정보를 가져온다.
+                    Authentication authentication = tokenProvider.getAuthentication(accessToken); // 사용자 인증 정보를 가져온다.
                     if (authentication != null) {                                                            // 인증 정보가 null이 아닐 경우 컨텍스트 홀더에 인증 정보를 저장 한다.
                         /**
                          * [ setAuthentication 사용 이유 ]
