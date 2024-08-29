@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.Cookie;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -35,11 +37,11 @@ class AccessTokenFilterTest {
         MockFilterChain filterChain = new MockFilterChain();
         String email = "kkk@naver.com";
         String tokenName = "accessToken";
-        String tokenValue = tokenProvider.createAccessToken(email,Authority.ROLE_USER.name());
+        String tokenValue = tokenProvider.createAccessToken(email,Authority.ROLE_USER.name(), new Date());
         Cookie cookie = new Cookie(tokenName, tokenValue);
         request.setCookies(cookie);
         // When
-        Authentication expectedAuthentication = tokenProvider.getAuthentication(request, tokenValue);
+        Authentication expectedAuthentication = tokenProvider.getAuthentication(tokenValue);
         accessTokenFilter.doFilterInternal(request, response, filterChain);
         Authentication actualAuthentication = SecurityContextHolder.getContext().getAuthentication();
         // Then

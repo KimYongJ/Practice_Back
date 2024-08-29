@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Oauth2UserInfo oauth2UserInfo = factoryUserInfo.makeOauth2Userinfo(registrationId,oAuth2User);
         String ID = oauth2UserInfo.getProviderId().concat( oauth2UserInfo.getProvider() );
 
-        String accessToken = tokenProvider.createAccessToken(ID, authorityString); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        String accessToken = tokenProvider.createAccessToken(ID, authorityString, new Date()); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         tokenProvider.saveCookie(response, "accessToken", accessToken, 1); // 응답에 토큰을 저장
         response.setStatus(HttpServletResponse.SC_OK);
         getRedirectStrategy().sendRedirect(request, response, frontUrl);          // 로그인 성공 후 메인페이지 리디렉션

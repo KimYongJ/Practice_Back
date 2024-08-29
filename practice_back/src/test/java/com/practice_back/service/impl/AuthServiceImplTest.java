@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -130,7 +131,7 @@ class AuthServiceImplTest {
         // Given
         String email = "kkk@naver.com";
         String tokenName = "tempToken";
-        String tokenValue = tokenProvider.createTempToken(email);
+        String tokenValue = tokenProvider.createTempToken(email, Authority.ROLE_USER.name(), new Date());
         Cookie cookie = new Cookie(tokenName, tokenValue);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(cookie);

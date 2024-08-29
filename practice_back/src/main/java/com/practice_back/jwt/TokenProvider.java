@@ -67,7 +67,7 @@ public class TokenProvider {
     /**
      * Access 토큰 생성
      * */
-    public String createAccessToken(String email, String auth)
+    public String createAccessToken(String email, String auth, Date date)
     {
         /*
         * 토큰 생성시 토큰에 세션 정보도 포함가능하다(클레임사용) 아래 코드 예시
@@ -77,7 +77,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .setSubject(email)                                                          // 토큰의 "sub"(subject) 클레임을 설정한다. sub 클레임은 토큰의 주체를 식별하는 데 사용되며, 일반적으로 사용자 ID나 이메일 주소와 같은 고유한 식별자를 사용함
                 .claim(AUTHORITIES_KEY , auth)                                              // claim(String, Object): 사용자 정의 클레임을 설정. 이 메소드는 키-값 쌍으로 클레임을 추가하며, 여기서는 사용자의 권한을 나타내는 auth 값을 AUTHORITIES_KEY라는 키와 함께 저장
-                .setExpiration(new Date((new Date()).getTime() + ACCESS_TOKEN_EXPIRE_TIME)) // 토큰의 만료 시간을 설정. 현재 시간에서 ACCESS_TOKEN_EXPIRE_TIME(밀리초 단위)을 더하여 만료 시간을 지정
+                .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRE_TIME)) // 토큰의 만료 시간을 설정. 현재 시간에서 ACCESS_TOKEN_EXPIRE_TIME(밀리초 단위)을 더하여 만료 시간을 지정
                 .signWith(key, SignatureAlgorithm.HS512)                                    // JWT에 서명을 추가합니다. 서명은 토큰의 무결성과 인증을 보장하는 데 사용된다.. 여기서는 HS512 알고리즘과 사전에 정의된 key를 사용
                 .compact();                                                                 // 위의 모든 설정으로 토큰을 생성하고, 최종적으로 문자열 형태로 압축하여 반환
     }
@@ -85,18 +85,18 @@ public class TokenProvider {
     /**
      * Temp 토큰 생성
      * */
-    public String createTempToken(String email)
+    public String createTempToken(String email, String auth, Date now)
     {
         return Jwts.builder()
                 .setSubject(email)
-                .claim(AUTHORITIES_KEY , "ROLE_USER")
-                .setExpiration(new Date((new Date()).getTime() + TEMP_TOKEN_EXPIRE_TIME))
+                .claim(AUTHORITIES_KEY , auth)
+                .setExpiration(new Date(now.getTime() + TEMP_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
     /**
-     * 응답에 쿠키 저장
+     * 응답에 쿠키 저장, flag : (1) accessToken (2) tempToken
      * */
     public void saveCookie(HttpServletResponse response , String cookieName, String token, int flag){
         int MAX_AGE = ACCESS_TOKEN_EXPIRE_TIME;
@@ -144,7 +144,7 @@ public class TokenProvider {
     /**
      * Jwt 토큰에서 인증 정보 조회, SecurityContextHolder에 저장하기 전 데이터 가공
      * */
-    public Authentication getAuthentication(HttpServletRequest request, String accessToken) {
+    public Authentication getAuthentication(String accessToken) {
 
         Claims claims = parseClaims(accessToken);// JWT 토큰에서 클레임(claims) 추출
 
@@ -169,7 +169,7 @@ public class TokenProvider {
     /**
      * Jwt토큰을 claims 형태로 반환
      * */
-    public Claims parseClaims(String tokenName)
+    private Claims parseClaims(String tokenName)
     {
         try{
             // JwtParserBuilder 인스턴스 생성 및 서명 키 설정
@@ -203,9 +203,9 @@ public class TokenProvider {
     /**
      * 쿠키 리셋
      * */
-    public void cookieReset(HttpServletResponse response, String tokenName)
+    public void cookieReset(HttpServletResponse response, String cookieName)
     {
-        ResponseCookie cookie =ResponseCookie.from(tokenName, "1")
+        ResponseCookie cookie =ResponseCookie.from(cookieName, "1")
                 .domain("localhost")
                 .sameSite("Lax") // Lax, None, Strict
                 //         .secure(true)//메서드를 호출하여 쿠키가 HTTPS를 통해서만 전송되도록 함. 개발환경에서는 비활성화, 비활성화 하면서 httpOnly가 true이면 sameSite는 None으로할 수 없다.
@@ -213,7 +213,7 @@ public class TokenProvider {
                 .path("/")
                 .maxAge(0)// 쿠키의 유효 시간 설정
                 .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        response.setHeader("Set-Cookie", cookie.toString());
     }
 
     /**

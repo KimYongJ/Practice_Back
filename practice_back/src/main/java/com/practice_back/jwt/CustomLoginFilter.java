@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static com.practice_back.handler.HandlerFunc.handlerException;
@@ -80,7 +81,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
                                     .collect(Collectors.joining(","));
         String Id               = principal.getUsername();
         String picture          = memberRepository.findPictureById(Id);
-        String accessToken      = tokenProvider.createAccessToken(Id, authorities); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
+        String accessToken      = tokenProvider.createAccessToken(Id, authorities, new Date()); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         long cntCartItems       = cartRepository.countItemsByMemberId(Id);
         boolean master          = authorities.contains("ROLE_ADMIN");
         LoginDTO loginDTO       = LoginDTO.builder()
