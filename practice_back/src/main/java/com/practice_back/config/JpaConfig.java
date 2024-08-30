@@ -42,9 +42,6 @@ public class JpaConfig {
 
 
 
-
-
-
 /**
  * 주석 1
  * [ @Configuration 설명 ]
