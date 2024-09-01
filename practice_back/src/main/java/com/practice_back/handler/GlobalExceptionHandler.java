@@ -39,7 +39,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("잘못된 요청입니다." + e.getMethod());
     }
-
     // 요청 데이터가 잘못되었을 때
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleMessageNotReadable(HttpMessageNotReadableException e) {
@@ -64,7 +63,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAllExceptions(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류가 발생했습니다.");
     }
-
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
