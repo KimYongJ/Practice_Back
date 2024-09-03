@@ -10,4 +10,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface WithMockCustomUser {
     String username() default  "member1";
     String password() default "12345678";
+    String[] roles() default {"USER"}; // 기본값으로 USER 권한을 설정
 }
