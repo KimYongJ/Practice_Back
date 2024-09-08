@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         memberRepository.save( member );
         String accessToken = tokenProvider.createAccessToken(member.getEmail(), Authority.ROLE_USER.name(), new Date()); // email을 통해 사용자의 권한을 가져와 accessToken을 생성
         tokenProvider.saveCookie(response,"accessToken",accessToken, 1); // 응답에 토큰을 저장한다.
-        return member.of(member);
+        return member.of();
     }
     @Override
     public ResponseEntity<Object> gettemptoken(HttpServletResponse response, LoginDTO loginDTO){
