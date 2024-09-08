@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberTest {
     @DisplayName("Member 객체를 생성할 수 있다.")
     @Test
-    void test(){
+    void createMembmerEntity(){
         // Given
         String email = "kkk@gmail.com";
         String password = "123";
