@@ -5,14 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.practice_back.dto.DeliveryAddressDTO;
 import com.practice_back.dto.MemberDTO;
 import com.practice_back.dto.UserProfileDTO;
-import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 
 @Getter
 @Entity                                     // 엔티티임을 알리는 어노테이션
@@ -72,19 +71,19 @@ public class Member extends BaseAudit{
                                         .findFirst()
                                         .map(DeliveryAddress::toDTO)
                                         .orElse(new DeliveryAddressDTO());
-        boolean master = member.getAuthority().name().equals("ROLE_ADMIN");
+        boolean isMaster = "ROLE_ADMIN".equals(member.getAuthority().name());
         return UserProfileDTO.builder()
-                .master(master)
+                .master(isMaster)
                 .email(member.getEmail())
                 .picture(member.getPicture())
                 .phoneNumber(member.getPhoneNumber())
                 .deliveryAddressDTO(delAddDTO)
                 .build();
     }
-    public MemberDTO of(Member member){
+    public MemberDTO of(){
         return MemberDTO.builder()
-                .email(member.getEmail())
-                .authority(member.getAuthority())
+                .email(this.email)
+                .authority(this.authority)
                 .build();
     }
 
