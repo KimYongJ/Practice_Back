@@ -15,7 +15,6 @@ public class GithubUserInfo implements Oauth2UserInfo{
     public Map<String, Object> getAttributes(){
         return attributes;
     }
-
     @Override
     public String getName(){
         return (String) attributes.get("name");
