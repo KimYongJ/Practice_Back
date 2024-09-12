@@ -2,12 +2,7 @@ package com.practice_back.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
-import java.util.LinkedHashMap;
 import java.util.Map;
-
 @Getter
 @Builder
 public class OAuthAttributes {
