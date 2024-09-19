@@ -2,12 +2,8 @@ package com.practice_back.dto;
 
 import com.practice_back.entity.Items;
 import lombok.*;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-
-
 @Getter
 @Setter
 @Builder
