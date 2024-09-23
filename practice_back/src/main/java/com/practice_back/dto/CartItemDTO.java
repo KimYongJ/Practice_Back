@@ -1,9 +1,5 @@
 package com.practice_back.dto;
-
-import com.practice_back.entity.CartItem;
 import lombok.*;
-
-
 @Getter
 @Setter
 @Builder
