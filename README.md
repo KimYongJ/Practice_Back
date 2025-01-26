@@ -55,4 +55,17 @@
 - MVC 프레임워크 기반 백엔드 서버 구축
 - 계층형 아키텍처
 
----
+## 시스템 아키텍처
+<img src="Docs/image/SystemArchitecture.png" width="80%">
+
+## ERD
+<img src="Docs/image/ERD.png" width="80%" height="400px">
+
+## 주요 기능
+### 소셜 로그인
+![sociallogin](/Docs/gif/sociallogin.gif)
+
+### 비밀번호 찾기
+![findpwd](/Docs/gif/findpwd.gif)
+
+
