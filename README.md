@@ -62,10 +62,20 @@
 <img src="Docs/image/ERD.png" width="80%" height="400px">
 
 ## 주요 기능
+
+
 ### 소셜 로그인
 ![sociallogin](/Docs/gif/sociallogin.gif)
+
 
 ### 비밀번호 찾기
 ![findpwd](/Docs/gif/findpwd.gif)
 
+### 카트 추가
+![addcart](/Docs/gif/addcart.gif)
 
+### 마스터 계정과 일반 사용자 계정 분리
+![master](/Docs/gif/master.gif)
+
+### S3에 이미지 업로드
+![upload](/Docs/gif/upload.gif)
