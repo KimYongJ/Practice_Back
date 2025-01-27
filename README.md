@@ -84,7 +84,7 @@
 
 JavaMailSender를 활용하여, 임시 비밀번호 발급 및 이메일 전송 기능을 구현했습니다.
 
-[[JavaMailSender]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/service/impl/EmailAuthServiceImpl.java)
+[[JavaMailSender 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/service/impl/EmailAuthServiceImpl.java)
 
 ![findpwd](/Docs/gif/findpwd.gif)
 
@@ -100,14 +100,42 @@ Spring Security를 사용하여, 관리자와 일반 사용자의 권한을 구�
 
 자세한 구현 내용은 아래 링크에서 확인하실 수 있습니다.
 
-[[SecurityFilterChain]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/config/WebSecurityConfig.java)
+[[SecurityFilterChain 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/config/WebSecurityConfig.java)
 
 ![master](/Docs/gif/master.gif)
 
 ##
 
-### S3에 이미지 업로드
+### S3를 활용한 이미지 업로드 및 관리 기능 구현
+
+AWS S3를 사용하여 이미지 업로드 기능을 구현하였습니다. 이 과정에서 S3의 설정을 분리하여 관리하기 쉽게 구성하였습니다.
+
+[[S3Config 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/config/S3Config.java)
+
+
+계층형 아키텍처를 기반으로 시스템을 설계하였으며, 각 기능의 구현을 Impl 클래스로 분리하여 확장성을 고려하고, 구현체를 독립적으로 관리할 수 있는 구조로 구성하였습니다.
+
+[[S3StorageServiceImpl 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/main/java/com/practice_back/service/impl/S3StorageServiceImpl.java)
+
+
+
 ![upload](/Docs/gif/upload.gif)
+
+##
+
+### 단위 테스트 및 통합 테스트 케이스를 작성해 자동화된 테스트 수행
+
+프로젝트의 모든 계층(service, repository, entity등)에 대해 철저한 테스트 케이스를 작성해 실제 운영 환경에서 발생할 수 있는 다양한 시나오리에 대해 테스트를 진행했습니다. 
+
+서비스단 테스트시 실제 인증 및 권한을 관리하기 위해 커스텀 어노테이션을 만들어 테스트 환경에서 모의 사용자 정보를 설정할 수 있도록 했습니다. 
+
+[[어노테이션 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/test/java/com/practice_back/annotation/withMockUser/WithMockCustomUserSecurityContextFactory.java)
+
+소셜 로그인 기능을 테스트하기 위해 Oauth2UserInfo 인터페이스를 구현한 모킹 클래스를 작성하여, 소셜 로그인 시 서버에서 반환되는 사용자 정보를 시뮬레이션했습니다.
+이를 통해 실제 외부 시스템과의 상호작용 없이 테스트 환경에서 소셜 로그인 로직의 정확성과 데이터베이스 저장 과정을 검증할 수 있었습니다.
+
+[[Mock객체 코드]](https://github.com/KimYongJ/Practice_Back/blob/master/practice_back/src/test/java/com/practice_back/mockClass/MockOauth2UserInfo.java)
+
 
 ##
 
